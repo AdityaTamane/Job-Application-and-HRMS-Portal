@@ -58,7 +58,7 @@ export function AdminJobs() {
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <Input className="pl-9" placeholder="Search jobs…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select value={status} onChange={(e) => setStatus(e.target.value as JobStatus | 'all')} className="sm:w-48">
@@ -75,7 +75,7 @@ export function AdminJobs() {
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400">
+              <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Job</th>
                   <th className="px-4 py-3 font-medium">Customer</th>
@@ -87,18 +87,18 @@ export function AdminJobs() {
               </thead>
               <tbody>
                 {filtered.map((j) => (
-                  <tr key={j.id} className="border-t border-slate-100 hover:bg-slate-50/50">
+                  <tr key={j.id} className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-800">{j.title}</span>
+                        <span className="font-medium text-slate-800 dark:text-slate-100">{j.title}</span>
                         {sosJobs.has(j.id) && <Siren className="h-4 w-4 text-red-500" />}
                       </div>
-                      <p className="text-xs text-slate-400">{catName.get(j.categoryId)} · {j.neighbourhood}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">{catName.get(j.categoryId)} · {j.neighbourhood}</p>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{userName.get(j.customerId) ?? '—'}</td>
-                    <td className="px-4 py-3 text-slate-600">{j.studentId ? studentName.get(j.studentId) : <span className="text-slate-300">Unassigned</span>}</td>
-                    <td className="px-4 py-3 text-slate-500">{formatDateTime(j.scheduledAt)}</td>
-                    <td className="px-4 py-3 font-medium text-slate-700">{formatCurrency(j.estimatedPrice)}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{userName.get(j.customerId) ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{j.studentId ? studentName.get(j.studentId) : <span className="text-slate-300">Unassigned</span>}</td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{formatDateTime(j.scheduledAt)}</td>
+                    <td className="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">{formatCurrency(j.estimatedPrice)}</td>
                     <td className="px-4 py-3"><StatusPill status={j.status} /></td>
                   </tr>
                 ))}

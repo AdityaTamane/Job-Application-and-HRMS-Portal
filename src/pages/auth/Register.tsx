@@ -126,14 +126,14 @@ export function Register() {
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center bg-slate-50 p-6">
+    <div className="flex min-h-full items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="mb-6 flex justify-center">
           <Link to="/"><Logo /></Link>
         </div>
         <div className="card p-6">
-          <h1 className="text-xl font-bold text-slate-900">Create your account</h1>
-          <p className="mt-1 text-sm text-slate-500">Choose how you'd like to join Lighthouse.</p>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Create your account</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Choose how you'd like to join Lighthouse.</p>
 
           <div className="mt-4 grid grid-cols-3 gap-2">
             {ROLE_TABS.map((t) => (
@@ -143,15 +143,15 @@ export function Register() {
                 onClick={() => setRole(t.id)}
                 className={cn(
                   'flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition',
-                  role === t.id ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-200' : 'border-slate-200 hover:border-slate-300',
+                  role === t.id ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-200' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300',
                 )}
               >
-                <t.icon className={cn('h-5 w-5', role === t.id ? 'text-brand-600' : 'text-slate-400')} />
-                <span className="text-xs font-medium text-slate-700">{t.label}</span>
+                <t.icon className={cn('h-5 w-5', role === t.id ? 'text-brand-600' : 'text-slate-400 dark:text-slate-500')} />
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-200">{t.label}</span>
               </button>
             ))}
           </div>
-          <p className="mt-2 text-center text-xs text-slate-400">{ROLE_TABS.find((t) => t.id === role)?.desc}</p>
+          <p className="mt-2 text-center text-xs text-slate-400 dark:text-slate-500">{ROLE_TABS.find((t) => t.id === role)?.desc}</p>
 
           <form onSubmit={submit} className="mt-5 space-y-3.5">
             <Field label="Full name" required>
@@ -196,7 +196,7 @@ export function Register() {
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-slate-500">
+          <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
             Already have an account?{' '}
             <Link to="/login" className="font-semibold text-brand-600 hover:underline">Log in</Link>
           </p>

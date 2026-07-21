@@ -40,7 +40,7 @@ export function RateBookingModal({
   return (
     <Modal open={open} onClose={onClose} title="Rate your experience" size="sm">
       <div className="space-y-4">
-        <p className="text-sm text-slate-600">How was “{job.title}”?</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300">How was “{job.title}”?</p>
         <div className="flex justify-center py-2">
           <Rating value={rating} interactive size={34} onChange={setRating} />
         </div>

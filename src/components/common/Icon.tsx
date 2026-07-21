@@ -4,6 +4,10 @@ import {
   Wallet, GraduationCap, FileText, Users, UserPlus, ScrollText, CalendarClock, CalendarOff, Banknote,
   // service categories
   Sparkles, Zap, Wrench, Scissors, ChefHat, HeartHandshake, PaintRoller,
+  // skills, chat, search
+  Award, Trophy, MessageCircle, Search,
+  // safety / incidents
+  Siren,
   // misc
   LayoutGrid, HelpCircle, type LucideIcon, type LucideProps,
 } from 'lucide-react'
@@ -14,6 +18,7 @@ const REGISTRY: Record<string, LucideIcon> = {
   Compass, CalendarCheck, MapPin, User, LayoutDashboard, Briefcase, Radar, ShieldCheck,
   Wallet, GraduationCap, FileText, Users, UserPlus, ScrollText, CalendarClock, CalendarOff, Banknote,
   Sparkles, Zap, Wrench, Scissors, ChefHat, HeartHandshake, PaintRoller,
+  Award, Trophy, MessageCircle, Search, Siren,
   LayoutGrid,
 }
 

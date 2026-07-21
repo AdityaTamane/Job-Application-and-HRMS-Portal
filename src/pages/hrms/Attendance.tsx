@@ -38,7 +38,7 @@ export function Attendance() {
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400">
+            <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-medium">Employee</th>
                 <th className="px-4 py-3 font-medium">Status</th>
@@ -51,13 +51,13 @@ export function Attendance() {
               {employees?.map((e) => {
                 const att = attMap.get(e.id)
                 return (
-                  <tr key={e.id} className="border-t border-slate-100">
+                  <tr key={e.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar name={e.name} size={34} />
                         <div>
-                          <p className="font-medium text-slate-800">{e.name}</p>
-                          <p className="text-xs text-slate-400">{e.department}</p>
+                          <p className="font-medium text-slate-800 dark:text-slate-100">{e.name}</p>
+                          <p className="text-xs text-slate-400 dark:text-slate-500">{e.department}</p>
                         </div>
                       </div>
                     </td>
@@ -70,8 +70,8 @@ export function Attendance() {
                         {STATUSES.map((s) => <option key={s} value={s}>{s.toUpperCase()}</option>)}
                       </Select>
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-600">{att?.checkIn ?? '—'}</td>
-                    <td className="px-4 py-3 font-mono text-slate-600">{att?.checkOut ?? '—'}</td>
+                    <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-300">{att?.checkIn ?? '—'}</td>
+                    <td className="px-4 py-3 font-mono text-slate-600 dark:text-slate-300">{att?.checkOut ?? '—'}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
                         <Button size="sm" variant="outline" icon={<LogIn className="h-3.5 w-3.5" />} disabled={!!att?.checkIn} onClick={() => checkIn(e)}>In</Button>
@@ -86,7 +86,7 @@ export function Attendance() {
         </div>
       </Card>
 
-      <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-400">
+      <p className="mt-3 flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
         <CalendarClock className="h-3.5 w-3.5" /> <StatusPill status="present" /> counts toward payroll working days.
       </p>
     </div>

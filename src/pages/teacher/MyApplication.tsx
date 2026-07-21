@@ -65,13 +65,13 @@ export function MyApplication() {
                         'flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition',
                         done && 'border-emerald-500 bg-emerald-500 text-white',
                         active && 'border-brand-500 bg-brand-50 text-brand-600',
-                        !done && !active && 'border-slate-200 bg-white text-slate-300',
+                        !done && !active && 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-300',
                       )}>
                         {done ? <Check className="h-5 w-5" /> : i + 1}
                       </div>
-                      <span className={cn('text-xs font-medium', active ? 'text-brand-600' : done ? 'text-emerald-600' : 'text-slate-400')}>{s.label}</span>
+                      <span className={cn('text-xs font-medium', active ? 'text-brand-600' : done ? 'text-emerald-600' : 'text-slate-400 dark:text-slate-500')}>{s.label}</span>
                     </div>
-                    {i < STAGES.length - 1 && <div className={cn('mx-1 h-0.5 flex-1', done ? 'bg-emerald-400' : 'bg-slate-200')} />}
+                    {i < STAGES.length - 1 && <div className={cn('mx-1 h-0.5 flex-1', done ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700')} />}
                   </div>
                 )
               })}
@@ -89,13 +89,13 @@ export function MyApplication() {
           ) : (
             <div className="space-y-3">
               {applicant.interviews.map((iv) => (
-                <div key={iv.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-100 p-3.5">
+                <div key={iv.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 p-3.5">
                   <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
                     {iv.mode === 'online' ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
                   </span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-800">{iv.mode === 'online' ? 'Online interview' : 'In-person interview'}</p>
-                    <p className="text-xs text-slate-500">{formatDateTime(iv.scheduledAt)} · with {iv.interviewer}</p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{iv.mode === 'online' ? 'Online interview' : 'In-person interview'}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{formatDateTime(iv.scheduledAt)} · with {iv.interviewer}</p>
                   </div>
                   {iv.result === 'pending' || !iv.result ? (
                     <Badge tone="amber"><Clock className="h-3 w-3" /> Upcoming</Badge>

@@ -54,8 +54,8 @@ export function Profile() {
           <div className="mb-5 flex items-center gap-4">
             <Avatar src={user.avatarUrl} name={user.name} size={64} />
             <div>
-              <p className="font-semibold text-slate-900">{user.name}</p>
-              <p className="text-sm text-slate-500">{user.email}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
             </div>
           </div>
           <form onSubmit={save} className="space-y-4">

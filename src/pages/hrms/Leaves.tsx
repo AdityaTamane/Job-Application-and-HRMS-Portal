@@ -47,16 +47,16 @@ export function Leaves() {
       {(leaves ?? []).length === 0 ? (
         <EmptyState icon={<CalendarOff className="h-7 w-7" />} title="No leave requests" description="Requests will appear here for approval." />
       ) : (
-        <Card className="divide-y divide-slate-100">
+        <Card className="divide-y divide-slate-100 dark:divide-slate-800">
           {leaves?.map((l) => (
             <div key={l.id} className="flex flex-wrap items-center gap-3 p-4">
               <Avatar name={empName.get(l.employeeId) ?? '?'} size={40} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium text-slate-800">{empName.get(l.employeeId) ?? 'Unknown'}</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-100">{empName.get(l.employeeId) ?? 'Unknown'}</p>
                   <Badge tone="blue" className="capitalize">{l.type}</Badge>
                 </div>
-                <p className="text-xs text-slate-500">{l.from}{l.to !== l.from ? ` → ${l.to}` : ''} · {l.reason}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{l.from}{l.to !== l.from ? ` → ${l.to}` : ''} · {l.reason}</p>
               </div>
               <StatusPill status={l.status} />
               {l.status === 'pending' && (

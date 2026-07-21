@@ -14,6 +14,9 @@ import type {
   PayrollRecord,
   Notification,
   AuditLog,
+  AssessmentResult,
+  ChatMessage,
+  IncidentCase,
 } from './types'
 
 export class LighthouseDB extends Dexie {
@@ -30,6 +33,9 @@ export class LighthouseDB extends Dexie {
   payroll!: Table<PayrollRecord, string>
   notifications!: Table<Notification, string>
   audit!: Table<AuditLog, string>
+  assessments!: Table<AssessmentResult, string>
+  chat!: Table<ChatMessage, string>
+  incidents!: Table<IncidentCase, string>
 
   constructor() {
     super('lighthouse')
@@ -47,6 +53,15 @@ export class LighthouseDB extends Dexie {
       payroll: 'id, employeeId, month',
       notifications: 'id, userId, read',
       audit: 'id, actorId',
+    })
+    // v2 — skill assessments (feature #6) and in-app chat (feature #5).
+    this.version(2).stores({
+      assessments: 'id, studentId, quizId, passed',
+      chat: 'id, threadId, jobId, senderId, recipientId, createdAt',
+    })
+    // v3 — incident & dispute center.
+    this.version(3).stores({
+      incidents: 'id, type, status, priority, jobId, raisedById, createdAt',
     })
   }
 }

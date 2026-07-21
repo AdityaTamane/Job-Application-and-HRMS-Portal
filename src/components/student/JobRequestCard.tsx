@@ -26,17 +26,17 @@ export function JobRequestCard({
   return (
     <div className="card p-4">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-semibold text-slate-900">{job.title}</h3>
+        <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
         <Badge tone="blue">{categoryName}</Badge>
         {variant === 'plain' && <StatusPill status={job.status} />}
       </div>
-      {job.description && <p className="mt-1 text-sm text-slate-600">{job.description}</p>}
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+      {job.description && <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{job.description}</p>}
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1"><CalendarClock className="h-3.5 w-3.5" /> {formatDateTime(job.scheduledAt)}</span>
         <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {job.address || job.neighbourhood}</span>
         <span className="flex items-center gap-1"><Receipt className="h-3.5 w-3.5" /> {formatCurrency(job.estimatedPrice)} · {job.durationHours}h</span>
       </div>
-      <p className="mt-2 text-xs text-slate-400">Requested by {customerName}</p>
+      <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">Requested by {customerName}</p>
 
       {variant === 'assigned' && (
         <div className="mt-3 flex gap-2">

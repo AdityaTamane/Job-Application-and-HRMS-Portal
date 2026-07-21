@@ -12,25 +12,82 @@
     height: 100%;
   }
   body {
-    @apply bg-slate-50 text-slate-800 antialiased;
+    @apply bg-slate-50 text-slate-800 antialiased transition-colors duration-200;
     font-family: 'Inter', system-ui, sans-serif;
+    background-image: radial-gradient(70% 55% at 15% -5%, rgba(79, 131, 200, 0.1) 0%, rgba(79, 131, 200, 0) 55%),
+      radial-gradient(55% 45% at 100% 0%, rgba(247, 168, 37, 0.08) 0%, rgba(247, 168, 37, 0) 55%);
+    background-attachment: fixed;
+  }
+  .dark body {
+    @apply bg-slate-950 text-slate-200;
+    background-image: radial-gradient(70% 55% at 15% -5%, rgba(47, 99, 173, 0.22) 0%, rgba(47, 99, 173, 0) 55%),
+      radial-gradient(55% 45% at 100% 0%, rgba(241, 143, 12, 0.12) 0%, rgba(241, 143, 12, 0) 55%);
+  }
+  /* Consistent visible focus ring for keyboard users across the app. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-400 ring-offset-2 ring-offset-white;
+  }
+  .dark :focus-visible {
+    @apply ring-brand-500 ring-offset-slate-950;
   }
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-200 bg-white shadow-card;
+    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card transition-shadow duration-200;
+  }
+  .dark .card {
+    @apply border-slate-800 bg-slate-900/80 shadow-none;
+  }
+  /* Frosted-glass surface for headers, overlays, hero cards. */
+  .glass {
+    @apply border border-white/60 bg-white/70 backdrop-blur-xl;
+  }
+  .dark .glass {
+    @apply border-white/10 bg-slate-900/60;
+  }
+  /* Gradient headline text. */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent;
+  }
+  .dark .gradient-text {
+    @apply from-brand-300 to-beacon-300;
+  }
+  /* Lightweight loading skeleton. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-slate-200/70 dark:bg-slate-800;
+  }
+  .skeleton::after {
+    @apply absolute inset-0 -translate-x-full animate-[shimmer_1.4s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent content-[''] dark:via-white/5;
   }
   .input {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm outline-none transition
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition
            placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
+  .dark .input {
+    @apply border-slate-700 bg-slate-800 text-slate-100 placeholder:text-slate-500
+           focus:border-brand-400 focus:ring-brand-900/50;
   }
   .label {
     @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+  .dark .label {
+    @apply text-slate-300;
   }
 }
 
 .leaflet-container {
   @apply rounded-xl;
   font: inherit;
+  /* Contain Leaflet's internal z-indexes (controls/panes go up to ~1000) so
+     they can't paint over modals, dropdowns and the command palette. */
+  isolation: isolate;
+  z-index: 0;
+}
+/* Keep Leaflet tiles legible in dark mode without washing out the map. */
+.dark .leaflet-tile {
+  filter: brightness(0.7) invert(1) contrast(0.9) hue-rotate(180deg) saturate(0.8);
+}
+.dark .leaflet-container {
+  @apply bg-slate-800;
 }

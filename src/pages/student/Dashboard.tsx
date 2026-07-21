@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button'
 import { StatusPill } from '@/components/ui/Badge'
 import { VerifiedBadge } from '@/components/common/VerifiedBadge'
 import { AvailabilityToggle } from '@/components/student/AvailabilityToggle'
+import { StreakCard, LeaderboardCard } from '@/components/student/Gamification'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 
 const ACTIVE_STATUSES = ['accepted', 'en_route', 'verifying', 'in_progress']
@@ -21,6 +22,7 @@ export function StudentDashboard() {
     async () => (student ? db.jobs.where('studentId').equals(student.id).toArray() : []),
     [student?.id],
   )
+  const allStudents = useLiveQuery(() => db.students.toArray(), [])
 
   const stats = useMemo(() => {
     const all = jobs ?? []
@@ -81,13 +83,13 @@ export function StudentDashboard() {
               <EmptyState icon={<Briefcase className="h-6 w-6" />} title="No active jobs" description="Accepted jobs will appear here, ready to start." />
             ) : (
               stats.active.map((job) => (
-                <div key={job.id} className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3.5 sm:flex-row sm:items-center">
+                <div key={job.id} className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-slate-800 p-3.5 sm:flex-row sm:items-center">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-slate-800">{job.title}</p>
+                      <p className="font-medium text-slate-800 dark:text-slate-100">{job.title}</p>
                       <StatusPill status={job.status} />
                     </div>
-                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                       <span className="flex items-center gap-1"><CalendarClock className="h-3.5 w-3.5" /> {formatDateTime(job.scheduledAt)}</span>
                       <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {job.neighbourhood}</span>
                     </div>
@@ -111,13 +113,25 @@ export function StudentDashboard() {
           </CardBody>
         </Card>
       </div>
+
+      {/* Gamification: streak + leaderboard */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <StreakCard
+          completedTimestamps={(jobs ?? [])
+            .filter((j) => j.status === 'completed')
+            .map((j) => j.scheduledAt || j.createdAt)}
+        />
+        <div className="lg:col-span-2">
+          <LeaderboardCard students={allStudents ?? []} meId={student.id} />
+        </div>
+      </div>
     </div>
   )
 }
 
 function QuickLink({ to, icon, label }: { to: string; icon: ReactNode; label: string }) {
   return (
-    <Link to={to} className="flex items-center gap-3 rounded-xl border border-slate-100 px-3.5 py-3 text-sm font-medium text-slate-700 transition hover:border-brand-200 hover:bg-brand-50">
+    <Link to={to} className="flex items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3.5 py-3 text-sm font-medium text-slate-700 dark:text-slate-200 transition hover:border-brand-200 hover:bg-brand-50">
       <span className="text-brand-500">{icon}</span>
       {label}
       <ArrowRight className="ml-auto h-4 w-4 text-slate-300" />

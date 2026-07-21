@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { ScanFace, Mic, KeyRound, MapPin, Check } from 'lucide-react'
 import type { GeoPoint, Job, WorkSession } from '@/lib/types'
+import { db } from '@/lib/db'
 import { updateSession, startWork } from '@/lib/workSession'
 import { Modal } from '@/components/ui/Modal'
 import { SelfieCapture } from './SelfieCapture'
@@ -31,6 +33,7 @@ export function WorkSessionGate({
 }) {
   const [step, setStep] = useState(0)
   const [starting, setStarting] = useState(false)
+  const student = useLiveQuery(() => db.students.get(session.studentId), [session.studentId])
 
   const finish = async (point: GeoPoint) => {
     setStarting(true)
@@ -57,14 +60,14 @@ export function WorkSessionGate({
                     'flex h-9 w-9 items-center justify-center rounded-full border-2 transition',
                     done && 'border-emerald-500 bg-emerald-500 text-white',
                     active && 'border-brand-500 bg-brand-50 text-brand-600',
-                    !done && !active && 'border-slate-200 bg-white text-slate-300',
+                    !done && !active && 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-300',
                   )}
                 >
                   {done ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
                 </div>
-                <span className={cn('text-[11px] font-medium', active ? 'text-brand-600' : 'text-slate-400')}>{s.label}</span>
+                <span className={cn('text-[11px] font-medium', active ? 'text-brand-600' : 'text-slate-400 dark:text-slate-500')}>{s.label}</span>
               </div>
-              {i < STEPS.length - 1 && <div className={cn('mx-1 h-0.5 flex-1', done ? 'bg-emerald-400' : 'bg-slate-200')} />}
+              {i < STEPS.length - 1 && <div className={cn('mx-1 h-0.5 flex-1', done ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700')} />}
             </div>
           )
         })}
@@ -73,8 +76,14 @@ export function WorkSessionGate({
       <div className="min-h-[300px]">
         {step === 0 && (
           <SelfieCapture
-            onCapture={async (dataUrl) => {
-              await updateSession(session.id, { selfieDataUrl: dataUrl, selfieVerified: true })
+            referencePhotoUrl={student?.photoUrl}
+            onCapture={async (r) => {
+              await updateSession(session.id, {
+                selfieDataUrl: r.dataUrl,
+                selfieVerified: r.passed,
+                livenessScore: r.livenessScore,
+                faceMatchScore: r.faceMatchScore,
+              })
               setStep(1)
             }}
           />

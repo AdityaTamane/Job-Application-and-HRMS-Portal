@@ -3,7 +3,7 @@ import type { BadgeTier } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 const CONFIG: Record<Exclude<BadgeTier, 'none'>, { label: string; icon: typeof BadgeCheck; cls: string }> = {
-  basic: { label: 'Basic Verified', icon: BadgeCheck, cls: 'bg-slate-100 text-slate-600' },
+  basic: { label: 'Basic Verified', icon: BadgeCheck, cls: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' },
   verified: { label: 'Verified', icon: ShieldCheck, cls: 'bg-brand-50 text-brand-700 ring-1 ring-brand-200' },
   premium: { label: 'Premium Verified', icon: Crown, cls: 'bg-beacon-50 text-beacon-700 ring-1 ring-beacon-300' },
 }

@@ -1,24 +1,17 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { CalendarClock, Clock, MapPin, Receipt } from 'lucide-react'
+import { Clock, MapPin, Receipt } from 'lucide-react'
 import type { Student } from '@/lib/types'
 import { db } from '@/lib/db'
 import { useAuth } from '@/lib/auth'
 import { createBooking, estimatePrice } from '@/lib/marketplace'
+import { upcomingAvailability, prettyTime, hasCustomAvailability } from '@/lib/availability'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Field, Input, Textarea, Select } from '@/components/ui/form'
 import { Avatar } from '@/components/ui/Avatar'
 import { toast } from '@/components/ui/toast'
-import { formatCurrency } from '@/lib/utils'
-
-function defaultDateTime() {
-  const d = new Date(Date.now() + 86400000)
-  d.setHours(10, 0, 0, 0)
-  // format for datetime-local input: YYYY-MM-DDTHH:mm
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
+import { cn, formatCurrency } from '@/lib/utils'
 
 export function BookingModal({
   student,
@@ -33,11 +26,16 @@ export function BookingModal({
 }) {
   const { user } = useAuth()
   const categories = useLiveQuery(() => db.categories.toArray(), [])
+  const studentJobs = useLiveQuery(
+    () => (student ? db.jobs.where('studentId').equals(student.id).toArray() : []),
+    [student?.id],
+  )
   const [categoryId, setCategoryId] = useState('')
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [address, setAddress] = useState('')
-  const [when, setWhen] = useState(defaultDateTime())
+  const [when, setWhen] = useState<number | null>(null)
+  const [dayIdx, setDayIdx] = useState(0)
   const [duration, setDuration] = useState('2')
   const [loading, setLoading] = useState(false)
 
@@ -45,14 +43,23 @@ export function BookingModal({
     () => categories?.filter((c) => student?.serviceCategoryIds.includes(c.id)) ?? [],
     [categories, student],
   )
+  const days = useMemo(
+    () => (student ? upcomingAvailability(student, studentJobs ?? [], Date.now()) : []),
+    [student, studentJobs],
+  )
   const activeCat = categoryId || cats[0]?.id || ''
   const price = student ? estimatePrice(student.hourlyRate, Number(duration) || 0) : 0
 
   if (!student) return null
+  const selectedDay = days[dayIdx]
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (!user) return
+    if (!when) {
+      toast.error('Please pick an available time slot')
+      return
+    }
     setLoading(true)
     try {
       await createBooking({
@@ -63,7 +70,7 @@ export function BookingModal({
         title: title || cats.find((c) => c.id === activeCat)?.name || 'Service booking',
         description,
         address,
-        scheduledAt: new Date(when).getTime(),
+        scheduledAt: when,
         durationHours: Number(duration) || 1,
       })
       toast.success('Booking requested!', `${student.name.split(' ')[0]} will confirm shortly.`)
@@ -73,6 +80,8 @@ export function BookingModal({
       setTitle('')
       setDescription('')
       setAddress('')
+      setWhen(null)
+      setDayIdx(0)
     } catch {
       toast.error('Could not create booking')
     } finally {
@@ -86,8 +95,8 @@ export function BookingModal({
         <div className="flex items-center gap-3 rounded-xl bg-brand-50 p-3">
           <Avatar src={student.photoUrl} name={student.name} size={44} />
           <div>
-            <p className="font-semibold text-slate-900">{student.name}</p>
-            <p className="text-xs text-slate-500">{formatCurrency(student.hourlyRate)}/hr · {student.neighbourhood}</p>
+            <p className="font-semibold text-slate-900 dark:text-slate-100">{student.name}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{formatCurrency(student.hourlyRate)}/hr · {student.neighbourhood}</p>
           </div>
         </div>
 
@@ -109,36 +118,86 @@ export function BookingModal({
 
         <Field label="Address" required>
           <div className="relative">
-            <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+            <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
             <Input className="pl-9" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Flat / street / landmark" required />
           </div>
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Date & time" required>
-            <div className="relative">
-              <CalendarClock className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              <Input className="pl-9" type="datetime-local" value={when} onChange={(e) => setWhen(e.target.value)} required />
+        <Field
+          label="Pick an available slot"
+          required
+          hint={hasCustomAvailability(student) ? `${student.name.split(' ')[0]}'s published availability` : undefined}
+        >
+          {days.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-400 dark:border-slate-700 dark:text-slate-500">
+              No open slots in the next few weeks. Try another pro.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {/* Day selector */}
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {days.map((d, i) => (
+                  <button
+                    key={d.ts}
+                    type="button"
+                    onClick={() => {
+                      setDayIdx(i)
+                      setWhen(null)
+                    }}
+                    className={cn(
+                      'flex shrink-0 flex-col items-center rounded-xl border px-3 py-1.5 text-xs font-semibold transition',
+                      i === dayIdx
+                        ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-200'
+                        : 'border-slate-200 text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:text-slate-400',
+                    )}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+              {/* Slots for selected day */}
+              <div className="flex flex-wrap gap-2">
+                {selectedDay?.slots.map((s) => (
+                  <button
+                    key={s.ts}
+                    type="button"
+                    disabled={s.taken}
+                    onClick={() => setWhen(s.ts)}
+                    className={cn(
+                      'rounded-lg border px-3 py-1.5 text-sm font-medium transition',
+                      s.taken
+                        ? 'cursor-not-allowed border-slate-200 text-slate-300 line-through dark:border-slate-800 dark:text-slate-600'
+                        : when === s.ts
+                          ? 'border-brand-500 bg-brand-gradient text-white shadow-glow'
+                          : 'border-slate-200 text-slate-600 hover:border-brand-300 dark:border-slate-700 dark:text-slate-300',
+                    )}
+                    title={s.taken ? 'Already booked' : undefined}
+                  >
+                    {prettyTime(s.time)}
+                  </button>
+                ))}
+              </div>
             </div>
-          </Field>
-          <Field label="Hours" required>
-            <div className="relative">
-              <Clock className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
-              <Input className="pl-9" type="number" min="1" max="12" step="0.5" value={duration} onChange={(e) => setDuration(e.target.value)} required />
-            </div>
-          </Field>
-        </div>
+          )}
+        </Field>
 
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3.5">
-          <span className="flex items-center gap-2 text-sm font-medium text-slate-600">
+        <Field label="Duration (hours)" required>
+          <div className="relative">
+            <Clock className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400 dark:text-slate-500" />
+            <Input className="pl-9" type="number" min="1" max="12" step="0.5" value={duration} onChange={(e) => setDuration(e.target.value)} required />
+          </div>
+        </Field>
+
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-3.5">
+          <span className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300">
             <Receipt className="h-4 w-4" /> Estimated total
           </span>
-          <span className="text-lg font-bold text-slate-900">{formatCurrency(price)}</span>
+          <span className="text-lg font-bold text-slate-900 dark:text-slate-100">{formatCurrency(price)}</span>
         </div>
 
         <div className="flex gap-2">
           <Button type="button" variant="outline" className="flex-1" onClick={onClose}>Cancel</Button>
-          <Button type="submit" className="flex-1" loading={loading}>Confirm booking</Button>
+          <Button type="submit" className="flex-1" loading={loading} disabled={!when}>Confirm booking</Button>
         </div>
       </form>
     </Modal>

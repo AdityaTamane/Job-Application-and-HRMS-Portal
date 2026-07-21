@@ -7,7 +7,9 @@ import {
 import { Users, UserCheck, CalendarOff, Banknote, ArrowRight, CheckCircle2, Home, XCircle, Clock } from 'lucide-react'
 import { db } from '@/lib/db'
 import { todayStr } from '@/lib/hrms'
+import { attritionRisk, hrInsights } from '@/lib/analytics'
 import type { AttendanceStatus } from '@/lib/types'
+import { InsightCards, AttritionCard } from '@/components/analytics/Analytics'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StatCard } from '@/components/ui/misc'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
@@ -29,9 +31,20 @@ const ATT_STATUS: { key: AttendanceStatus; label: string; color: string; icon: t
 export function HrmsDashboard() {
   const employees = useLiveQuery(() => db.employees.toArray(), [])
   const attendance = useLiveQuery(() => db.attendance.where('date').equals(todayStr()).toArray(), [])
+  const allAttendance = useLiveQuery(() => db.attendance.toArray(), [])
   const leaves = useLiveQuery(() => db.leaves.toArray(), [])
 
   const active = (employees ?? []).filter((e) => e.status !== 'terminated')
+
+  const now = Date.now()
+  const insights = useMemo(
+    () => hrInsights(employees ?? [], leaves ?? [], allAttendance ?? [], now),
+    [employees, leaves, allAttendance, now],
+  )
+  const risks = useMemo(
+    () => attritionRisk(employees ?? [], leaves ?? [], allAttendance ?? [], now),
+    [employees, leaves, allAttendance, now],
+  )
 
   const deptData = useMemo(() => {
     const m = new Map<string, number>()
@@ -54,6 +67,8 @@ export function HrmsDashboard() {
   return (
     <div>
       <PageHeader title="HRMS Dashboard" subtitle="People operations at Lighthouse Academy" />
+
+      <InsightCards insights={insights} />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Employees" value={active.length} tone="brand" icon={<Users className="h-5 w-5" />} />
@@ -86,7 +101,7 @@ export function HrmsDashboard() {
           <CardHeader title="Attendance today" subtitle={todayStr()} />
           <CardBody>
             {attData.length === 0 ? (
-              <p className="py-16 text-center text-sm text-slate-400">No attendance marked yet today.</p>
+              <p className="py-16 text-center text-sm text-slate-400 dark:text-slate-500">No attendance marked yet today.</p>
             ) : (
               <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <ResponsiveContainer width="60%" height={200}>
@@ -101,9 +116,9 @@ export function HrmsDashboard() {
                   {attData.map((s) => (
                     <div key={s.key} className="flex items-center gap-2 text-sm">
                       <span className="h-2.5 w-2.5 rounded-full" style={{ background: s.color }} />
-                      <s.icon className="h-3.5 w-3.5 text-slate-400" />
-                      <span className="text-slate-600">{s.label}</span>
-                      <span className="font-semibold text-slate-800">{s.value}</span>
+                      <s.icon className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                      <span className="text-slate-600 dark:text-slate-300">{s.label}</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">{s.value}</span>
                     </div>
                   ))}
                 </div>
@@ -113,6 +128,10 @@ export function HrmsDashboard() {
         </Card>
       </div>
 
+      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Attrition risk radar */}
+      <AttritionCard risks={risks} />
+
       {/* Pending leaves */}
       <Card>
         <CardHeader
@@ -121,14 +140,14 @@ export function HrmsDashboard() {
         />
         <CardBody className="space-y-2">
           {pendingLeaves.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-400">No pending requests 🎉</p>
+            <p className="py-6 text-center text-sm text-slate-400 dark:text-slate-500">No pending requests 🎉</p>
           ) : (
             pendingLeaves.map((l) => (
-              <div key={l.id} className="flex items-center gap-3 rounded-xl border border-slate-100 p-3">
+              <div key={l.id} className="flex items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 p-3">
                 <Avatar name={empName.get(l.employeeId) ?? '?'} size={38} />
                 <div className="flex-1">
-                  <p className="font-medium text-slate-800">{empName.get(l.employeeId)}</p>
-                  <p className="text-xs text-slate-500 capitalize">{l.type} leave · {l.from}{l.to !== l.from ? ` → ${l.to}` : ''}</p>
+                  <p className="font-medium text-slate-800 dark:text-slate-100">{empName.get(l.employeeId)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{l.type} leave · {l.from}{l.to !== l.from ? ` → ${l.to}` : ''}</p>
                 </div>
                 <StatusPill status={l.status} />
                 <Link to="/hrms/leaves"><Button size="sm" variant="outline">Review</Button></Link>
@@ -137,6 +156,7 @@ export function HrmsDashboard() {
           )}
         </CardBody>
       </Card>
+      </div>
     </div>
   )
 }

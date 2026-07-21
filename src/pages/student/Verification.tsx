@@ -16,7 +16,7 @@ import type { VerificationStatus } from '@/lib/types'
 const BANNER: Record<VerificationStatus, { icon: typeof ShieldCheck; cls: string; title: string; desc: string }> = {
   unverified: {
     icon: ShieldQuestion,
-    cls: 'from-slate-100 to-slate-50 text-slate-700',
+    cls: 'from-slate-100 to-slate-50 text-slate-700 dark:text-slate-200',
     title: 'Not verified yet',
     desc: 'Upload your documents below and submit for review to earn your verified badge.',
   },
@@ -92,7 +92,7 @@ export function Verification() {
       </div>
 
       {!hasAllRequired && student.verificationStatus !== 'verified' && (
-        <p className="mb-4 text-sm text-slate-500">
+        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
           Upload all required documents (Aadhaar, Marksheet, Photo) to enable submission.
         </p>
       )}
@@ -111,7 +111,7 @@ export function Verification() {
         ))}
       </div>
 
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-500">
+      <div className="mt-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 text-xs text-slate-500 dark:text-slate-400">
         🔒 Your documents are used only for identity verification by the Lighthouse admin team and are never shared with
         customers. Only your verified badge is shown publicly.
       </div>

@@ -41,7 +41,7 @@ export function AdminAudit() {
       <PageHeader title="Audit Log" subtitle="An immutable trail of every significant action" />
 
       <div className="mb-4 relative max-w-md">
-        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+        <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
         <Input className="pl-9" placeholder="Search by actor, action, detail…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
 
@@ -51,7 +51,7 @@ export function AdminAudit() {
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400">
+              <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Time</th>
                   <th className="px-4 py-3 font-medium">Actor</th>
@@ -61,11 +61,11 @@ export function AdminAudit() {
               </thead>
               <tbody>
                 {filtered.map((a) => (
-                  <tr key={a.id} className="border-t border-slate-100">
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-500">{formatDateTime(a.createdAt)}</td>
-                    <td className="px-4 py-3 font-medium text-slate-700">{a.actorName}</td>
+                  <tr key={a.id} className="border-t border-slate-100 dark:border-slate-800">
+                    <td className="whitespace-nowrap px-4 py-3 text-slate-500 dark:text-slate-400">{formatDateTime(a.createdAt)}</td>
+                    <td className="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">{a.actorName}</td>
                     <td className="px-4 py-3"><Badge tone={ACTION_TONE[a.action] ?? 'gray'}>{a.action.replace(/_/g, ' ')}</Badge></td>
-                    <td className="px-4 py-3 text-slate-500">{a.meta ?? '—'}</td>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{a.meta ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>

@@ -63,19 +63,19 @@ export function MicCheck({ onGranted }: { onGranted: () => void }) {
 
   return (
     <div className="flex flex-col items-center text-center">
-      <div className={`flex h-24 w-24 items-center justify-center rounded-full ${granted ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
+      <div className={`flex h-24 w-24 items-center justify-center rounded-full ${granted ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'}`}>
         <Mic className="h-10 w-10" />
       </div>
 
       {error ? (
         <div className="mt-4 flex flex-col items-center gap-2">
           <AlertTriangle className="h-6 w-6 text-beacon-500" />
-          <p className="max-w-xs text-sm text-slate-600">{error}</p>
+          <p className="max-w-xs text-sm text-slate-600 dark:text-slate-300">{error}</p>
           <Button size="sm" variant="outline" icon={<RefreshCw className="h-4 w-4" />} onClick={start}>Retry</Button>
         </div>
       ) : (
         <>
-          <p className="mt-4 text-sm text-slate-600">
+          <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
             {granted ? 'Microphone active — say something to test the level.' : 'Requesting microphone access…'}
           </p>
           <div className="mt-4 flex h-10 items-end gap-1">
@@ -84,7 +84,7 @@ export function MicCheck({ onGranted }: { onGranted: () => void }) {
               return (
                 <span
                   key={i}
-                  className={`w-2 rounded-full transition-all ${active ? 'bg-brand-500' : 'bg-slate-200'}`}
+                  className={`w-2 rounded-full transition-all ${active ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                   style={{ height: `${8 + (i / bars.length) * 32}px`, opacity: active ? 1 : 0.5 }}
                 />
               )

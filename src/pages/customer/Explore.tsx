@@ -11,9 +11,10 @@ import { EmptyState } from '@/components/ui/misc'
 import { StudentCard } from '@/components/marketplace/StudentCard'
 import { StudentProfileModal } from '@/components/marketplace/StudentProfileModal'
 import { BookingModal } from '@/components/marketplace/BookingModal'
+import { scoreStudent } from '@/lib/match'
 import { cn } from '@/lib/utils'
 
-type SortKey = 'rating' | 'price_low' | 'price_high' | 'jobs'
+type SortKey = 'match' | 'rating' | 'price_low' | 'price_high' | 'jobs'
 
 export function Explore() {
   const categories = useLiveQuery(() => db.categories.toArray(), [])
@@ -23,7 +24,7 @@ export function Explore() {
   const [neighbourhood, setNeighbourhood] = useState<string>('all')
   const [query, setQuery] = useState('')
   const [verifiedOnly, setVerifiedOnly] = useState(true)
-  const [sort, setSort] = useState<SortKey>('rating')
+  const [sort, setSort] = useState<SortKey>('match')
 
   const [viewing, setViewing] = useState<Student | null>(null)
   const [booking, setBooking] = useState<Student | null>(null)
@@ -39,14 +40,17 @@ export function Explore() {
         (s) => s.name.toLowerCase().includes(q) || s.skills.some((sk) => sk.toLowerCase().includes(q)),
       )
     }
-    const sorted = [...list]
-    sorted.sort((a, b) => {
-      if (sort === 'rating') return b.rating - a.rating
-      if (sort === 'price_low') return a.hourlyRate - b.hourlyRate
-      if (sort === 'price_high') return b.hourlyRate - a.hourlyRate
-      return b.jobsCompleted - a.jobsCompleted
+    // Attach an explainable AI match score to every candidate for the context.
+    const ctx = { categoryId: category, neighbourhood, query }
+    const scored = list.map((student) => ({ student, match: scoreStudent(student, ctx) }))
+    scored.sort((a, b) => {
+      if (sort === 'match') return b.match.score - a.match.score
+      if (sort === 'rating') return b.student.rating - a.student.rating
+      if (sort === 'price_low') return a.student.hourlyRate - b.student.hourlyRate
+      if (sort === 'price_high') return b.student.hourlyRate - a.student.hourlyRate
+      return b.student.jobsCompleted - a.student.jobsCompleted
     })
-    return sorted
+    return scored
   }, [students, verifiedOnly, category, neighbourhood, query, sort])
 
   return (
@@ -73,7 +77,7 @@ export function Explore() {
       {/* Filters */}
       <div className="card mb-5 flex flex-col gap-3 p-4 md:flex-row md:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <Input
             className="pl-9"
             placeholder="Search by name or skill…"
@@ -87,7 +91,8 @@ export function Explore() {
             <option key={n} value={n}>{n}</option>
           ))}
         </Select>
-        <Select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="md:w-40">
+        <Select value={sort} onChange={(e) => setSort(e.target.value as SortKey)} className="md:w-44">
+          <option value="match">✨ Smart match</option>
           <option value="rating">Top rated</option>
           <option value="jobs">Most jobs</option>
           <option value="price_low">Price: low to high</option>
@@ -97,14 +102,19 @@ export function Explore() {
           onClick={() => setVerifiedOnly((v) => !v)}
           className={cn(
             'flex items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition',
-            verifiedOnly ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-300 text-slate-600',
+            verifiedOnly ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300',
           )}
         >
           <SlidersHorizontal className="h-4 w-4" /> Verified only
         </button>
       </div>
 
-      <p className="mb-3 text-sm text-slate-500">{filtered.length} pro{filtered.length !== 1 && 's'} available</p>
+      <p className="mb-3 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
+        {filtered.length} pro{filtered.length !== 1 && 's'} available
+        {sort === 'match' && (
+          <span className="text-slate-400 dark:text-slate-500">· ranked by AI Smart-Match</span>
+        )}
+      </p>
 
       {filtered.length === 0 ? (
         <EmptyState
@@ -114,8 +124,15 @@ export function Explore() {
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((s) => (
-            <StudentCard key={s.id} student={s} onView={setViewing} onBook={setBooking} />
+          {filtered.map(({ student, match }, i) => (
+            <StudentCard
+              key={student.id}
+              student={student}
+              match={match}
+              bestMatch={sort === 'match' && i === 0 && match.score >= 70}
+              onView={setViewing}
+              onBook={setBooking}
+            />
           ))}
         </div>
       )}
@@ -150,7 +167,7 @@ function CategoryTile({
       onClick={onClick}
       className={cn(
         'flex min-w-[92px] shrink-0 flex-col items-center gap-2 rounded-2xl border p-4 transition',
-        active ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
+        active ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-slate-300',
       )}
     >
       <Icon name={icon} className="h-6 w-6" />

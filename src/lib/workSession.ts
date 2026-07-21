@@ -1,4 +1,5 @@
 import { db, logAudit, notify } from './db'
+import { createIncident } from './incidents'
 import { uid, generateOtp, distanceMeters } from './utils'
 import type { GeoPoint, Job, Student, WorkSession } from './types'
 
@@ -102,9 +103,24 @@ export async function triggerSos(session: WorkSession, job: Job) {
   const admin = await db.users.where('role').equals('admin').first()
   const student = await db.students.get(session.studentId)
   const name = student?.name ?? 'A student'
-  if (admin) await notify(admin.id, '🚨 SOS triggered', `${name} raised an SOS during "${job.title}" at ${job.address}.`, 'warning', '/admin')
+  if (admin) await notify(admin.id, '🚨 SOS triggered', `${name} raised an SOS during "${job.title}" at ${job.address}.`, 'warning', '/admin/incidents')
   await notify(job.customerId, 'Safety alert', `An SOS was raised for your job "${job.title}". Our team has been alerted.`, 'warning')
   if (student) await logAudit(student.userId, student.name, 'sos', job.id, job.address)
+  // Log a high-priority incident case for the admin safety queue.
+  const trail = session.locationTrail[session.locationTrail.length - 1]
+  await createIncident({
+    type: 'sos',
+    jobId: job.id,
+    raisedById: student?.userId ?? session.studentId,
+    raisedByName: name,
+    raisedByRole: 'student',
+    againstName: undefined,
+    subject: `SOS during "${job.title}"`,
+    description: `Emergency alert raised at ${job.address || job.neighbourhood}. Immediate safety review required.`,
+    priority: 'high',
+    lat: trail?.lat ?? job.lat,
+    lng: trail?.lng ?? job.lng,
+  })
 }
 
 /** Small deterministic jitter around a point to simulate live movement. */

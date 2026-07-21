@@ -57,10 +57,10 @@ export function ApplicantModal({ applicant, open, onClose }: { applicant: Teache
           <Avatar name={applicant.name} size={64} />
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-xl font-bold text-slate-900">{applicant.name}</h2>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{applicant.name}</h2>
               <StatusPill status={applicant.stage} />
             </div>
-            <p className="text-sm text-slate-500">{applicant.subject} · {applicant.experienceYears} yrs experience</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{applicant.subject} · {applicant.experienceYears} yrs experience</p>
             <div className="mt-1.5"><Rating value={applicant.rating} interactive size={18} onChange={(r) => setRating(applicant, r)} /></div>
           </div>
         </div>
@@ -72,12 +72,12 @@ export function ApplicantModal({ applicant, open, onClose }: { applicant: Teache
           <InfoRow icon={<GraduationCap className="h-4 w-4" />} label={applicant.qualifications || 'Not specified'} />
           <InfoRow icon={<Briefcase className="h-4 w-4" />} label={`${applicant.experienceYears} years`} />
         </div>
-        {applicant.coverNote && <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">{applicant.coverNote}</p>}
+        {applicant.coverNote && <p className="rounded-xl bg-slate-50 dark:bg-slate-900 p-3 text-sm text-slate-600 dark:text-slate-300">{applicant.coverNote}</p>}
 
         {/* Stage control */}
         {applicant.stage !== 'hired' && applicant.stage !== 'rejected' && (
-          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 p-3">
-            <span className="text-sm font-medium text-slate-600">Move to:</span>
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Move to:</span>
             {nextStage && nextStage.stage !== 'hired' && (
               <Button size="sm" icon={<ChevronRight className="h-4 w-4" />} onClick={async () => { await moveStage(applicant, nextStage.stage, admin); toast.success(`Moved to ${nextStage.label}`) }}>
                 {nextStage.label}
@@ -93,7 +93,7 @@ export function ApplicantModal({ applicant, open, onClose }: { applicant: Teache
         {/* Hire form */}
         {hiring && (
           <div className="space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
-            <p className="text-sm font-semibold text-slate-700">Create employee record</p>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Create employee record</p>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Designation"><Input value={hire.designation} onChange={(e) => setHire({ ...hire, designation: e.target.value })} placeholder={`${applicant.subject} Instructor`} /></Field>
               <Field label="Department">
@@ -120,14 +120,14 @@ export function ApplicantModal({ applicant, open, onClose }: { applicant: Teache
 
         {/* Interviews */}
         <section>
-          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"><CalendarPlus className="h-4 w-4" /> Interviews</h3>
+          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200"><CalendarPlus className="h-4 w-4" /> Interviews</h3>
           <div className="space-y-2">
             {applicant.interviews.map((round) => (
               <InterviewRow key={round.id} applicant={applicant} round={round} />
             ))}
-            {applicant.interviews.length === 0 && <p className="text-sm text-slate-400">No interviews scheduled yet.</p>}
+            {applicant.interviews.length === 0 && <p className="text-sm text-slate-400 dark:text-slate-500">No interviews scheduled yet.</p>}
           </div>
-          <div className="mt-3 grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-4">
+          <div className="mt-3 grid gap-2 rounded-xl border border-slate-200 dark:border-slate-800 p-3 sm:grid-cols-4">
             <Input type="datetime-local" value={iv.when} onChange={(e) => setIv({ ...iv, when: e.target.value })} className="sm:col-span-2" />
             <Select value={iv.mode} onChange={(e) => setIv({ ...iv, mode: e.target.value })}>
               <option value="online">Online</option>
@@ -141,15 +141,15 @@ export function ApplicantModal({ applicant, open, onClose }: { applicant: Teache
 
         {/* Notes */}
         <section>
-          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"><MessageSquarePlus className="h-4 w-4" /> Recruiter notes</h3>
+          <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200"><MessageSquarePlus className="h-4 w-4" /> Recruiter notes</h3>
           <div className="space-y-2">
             {applicant.recruiterNotes.map((n) => (
-              <div key={n.id} className="rounded-xl bg-slate-50 p-3 text-sm">
-                <p className="text-slate-700">{n.text}</p>
-                <p className="mt-1 text-xs text-slate-400">{n.author} · {formatDateTime(n.at)}</p>
+              <div key={n.id} className="rounded-xl bg-slate-50 dark:bg-slate-900 p-3 text-sm">
+                <p className="text-slate-700 dark:text-slate-200">{n.text}</p>
+                <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{n.author} · {formatDateTime(n.at)}</p>
               </div>
             ))}
-            {applicant.recruiterNotes.length === 0 && <p className="text-sm text-slate-400">No notes yet.</p>}
+            {applicant.recruiterNotes.length === 0 && <p className="text-sm text-slate-400 dark:text-slate-500">No notes yet.</p>}
           </div>
           <div className="mt-2 flex gap-2">
             <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add an internal note…" />
@@ -163,8 +163,8 @@ export function ApplicantModal({ applicant, open, onClose }: { applicant: Teache
 
 function InfoRow({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-slate-600">
-      <span className="text-slate-400">{icon}</span>
+    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+      <span className="text-slate-400 dark:text-slate-500">{icon}</span>
       <span className="truncate">{label}</span>
     </div>
   )
@@ -172,12 +172,12 @@ function InfoRow({ icon, label }: { icon: ReactNode; label: string }) {
 
 function InterviewRow({ applicant, round }: { applicant: TeacherApplicant; round: InterviewRound }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-100 p-3 text-sm">
-      <span className="flex items-center gap-1.5 text-slate-600">
+    <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-100 dark:border-slate-800 p-3 text-sm">
+      <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
         {round.mode === 'online' ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
         {formatDateTime(round.scheduledAt)}
       </span>
-      <span className="text-slate-400">· {round.interviewer}</span>
+      <span className="text-slate-400 dark:text-slate-500">· {round.interviewer}</span>
       <div className="ml-auto flex items-center gap-2">
         {round.result && round.result !== 'pending' ? (
           <Badge tone={round.result === 'pass' ? 'green' : 'red'}>{round.result === 'pass' ? 'Passed' : 'Failed'}</Badge>
@@ -188,7 +188,7 @@ function InterviewRow({ applicant, round }: { applicant: TeacherApplicant; round
           </>
         )}
       </div>
-      {round.notes && <p className="w-full text-xs text-slate-400">{round.notes}</p>}
+      {round.notes && <p className="w-full text-xs text-slate-400 dark:text-slate-500">{round.notes}</p>}
     </div>
   )
 }

@@ -51,15 +51,15 @@ export function ToastViewport() {
         <div
           key={t.id}
           className={cn(
-            'animate-fade-in flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 shadow-lift',
+            'animate-fade-in flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 shadow-lift dark:border-slate-700 dark:bg-slate-800',
           )}
         >
           {icons[t.type]}
           <div className="flex-1">
-            <p className="text-sm font-semibold text-slate-800">{t.title}</p>
-            {t.message && <p className="mt-0.5 text-xs text-slate-500">{t.message}</p>}
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{t.title}</p>
+            {t.message && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{t.message}</p>}
           </div>
-          <button onClick={() => dismiss(t.id)} className="text-slate-300 hover:text-slate-500">
+          <button onClick={() => dismiss(t.id)} className="text-slate-300 hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-300">
             <X className="h-4 w-4" />
           </button>
         </div>

@@ -95,13 +95,13 @@ export function Payroll() {
         />
       ) : (
         <Card className="overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-100 p-4">
-            <p className="text-sm font-medium text-slate-600">{month} · {totals.count} employees</p>
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 p-4">
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{month} · {totals.count} employees</p>
             <Button size="sm" variant="success" icon={<CheckCheck className="h-4 w-4" />} onClick={markAllPaid}>Mark all paid</Button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400">
+              <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Employee</th>
                   <th className="px-4 py-3 text-right font-medium">Base</th>
@@ -113,17 +113,17 @@ export function Payroll() {
               </thead>
               <tbody>
                 {records?.map((r) => (
-                  <tr key={r.id} className="border-t border-slate-100">
+                  <tr key={r.id} className="border-t border-slate-100 dark:border-slate-800">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar name={empName.get(r.employeeId) ?? '?'} size={32} />
-                        <span className="font-medium text-slate-800">{empName.get(r.employeeId)}</span>
+                        <span className="font-medium text-slate-800 dark:text-slate-100">{empName.get(r.employeeId)}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right text-slate-600">{formatCurrency(r.base)}</td>
+                    <td className="px-4 py-3 text-right text-slate-600 dark:text-slate-300">{formatCurrency(r.base)}</td>
                     <td className="px-4 py-3 text-right text-emerald-600">+{formatCurrency(r.allowances)}</td>
                     <td className="px-4 py-3 text-right text-red-500">−{formatCurrency(r.deductions)}</td>
-                    <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatCurrency(r.net)}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-slate-900 dark:text-slate-100">{formatCurrency(r.net)}</td>
                     <td className="px-4 py-3 text-center">
                       <button onClick={() => cycleStatus(r)} title="Click to advance status">
                         <StatusPill status={r.status} />

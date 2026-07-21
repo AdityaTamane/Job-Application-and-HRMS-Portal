@@ -6,12 +6,13 @@ type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'succe
 type Size = 'sm' | 'md' | 'lg' | 'icon'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm',
-  secondary: 'bg-beacon-400 text-brand-950 hover:bg-beacon-500 shadow-sm',
-  outline: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50',
-  ghost: 'text-slate-600 hover:bg-slate-100',
-  danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
+  primary: 'bg-brand-gradient text-white shadow-glow hover:brightness-110',
+  secondary: 'bg-beacon-gradient text-brand-950 shadow-glow-beacon hover:brightness-105',
+  outline:
+    'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
+  ghost: 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+  danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700',
+  success: 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700',
 }
 
 const sizes: Record<Size, string> = {
@@ -41,8 +42,8 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-xl font-medium transition-colors',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:opacity-50 disabled:pointer-events-none',
+        'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-150 active:scale-[0.97]',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100',
         variants[variant],
         sizes[size],
         className,

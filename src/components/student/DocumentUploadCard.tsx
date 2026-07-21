@@ -56,14 +56,14 @@ export function DocumentUploadCard({
     <div className={cn('card p-4', doc?.status === 'rejected' && 'ring-1 ring-red-200')}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className={cn('rounded-xl p-2.5', doc ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-400')}>
+          <div className={cn('rounded-xl p-2.5', doc ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500')}>
             {doc ? <FileCheck2 className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
           </div>
           <div>
-            <p className="text-sm font-semibold text-slate-800">
-              {label} {optional && <span className="text-xs font-normal text-slate-400">(optional)</span>}
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              {label} {optional && <span className="text-xs font-normal text-slate-400 dark:text-slate-500">(optional)</span>}
             </p>
-            <p className="mt-0.5 text-xs text-slate-500">{hint}</p>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{hint}</p>
           </div>
         </div>
         {status && (
@@ -74,15 +74,15 @@ export function DocumentUploadCard({
       </div>
 
       {doc && (
-        <div className="mt-3 flex items-center gap-3 rounded-xl bg-slate-50 p-2.5">
+        <div className="mt-3 flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-900 p-2.5">
           {isImage ? (
-            <img src={doc.dataUrl} alt={label} className="h-12 w-12 rounded-lg border border-slate-200 object-cover" />
+            <img src={doc.dataUrl} alt={label} className="h-12 w-12 rounded-lg border border-slate-200 dark:border-slate-800 object-cover" />
           ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500">
               <FileText className="h-5 w-5" />
             </div>
           )}
-          <span className="truncate text-xs text-slate-500">{doc.fileName}</span>
+          <span className="truncate text-xs text-slate-500 dark:text-slate-400">{doc.fileName}</span>
         </div>
       )}
 

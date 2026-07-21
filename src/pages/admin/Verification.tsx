@@ -64,16 +64,16 @@ export function AdminVerification() {
                 <Avatar src={s.photoUrl} name={s.name} size={48} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="truncate font-semibold text-slate-900">{s.name}</h3>
+                    <h3 className="truncate font-semibold text-slate-900 dark:text-slate-100">{s.name}</h3>
                   </div>
-                  <p className="text-xs text-slate-500">{s.academyBatch} · {s.neighbourhood}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{s.academyBatch} · {s.neighbourhood}</p>
                   <div className="mt-1.5 flex items-center gap-2">
                     <StatusPill status={s.verificationStatus} />
                     {s.badgeTier !== 'none' && <VerifiedBadge tier={s.badgeTier} showLabel={false} size="sm" />}
                   </div>
                 </div>
               </div>
-              <div className="mt-3 flex items-center justify-between text-xs text-slate-400">
+              <div className="mt-3 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
                 <span className="flex items-center gap-1"><FileSearch className="h-3.5 w-3.5" /> {docCount.get(s.id) ?? 0} documents</span>
                 {s.verificationStatus === 'pending' && <span className="flex items-center gap-1 text-beacon-600"><Clock className="h-3.5 w-3.5" /> awaiting review</span>}
               </div>

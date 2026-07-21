@@ -67,17 +67,17 @@ export function VerificationReviewModal({ student, open, onClose }: { student: S
           <Avatar src={student.photoUrl} name={student.name} size={52} />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold text-slate-900">{student.name}</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{student.name}</h3>
               <StatusPill status={student.verificationStatus} />
             </div>
-            <p className="text-sm text-slate-500">{student.academyBatch} · {student.neighbourhood}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{student.academyBatch} · {student.neighbourhood}</p>
           </div>
           {student.badgeTier !== 'none' && <VerifiedBadge tier={student.badgeTier} />}
         </div>
 
         <div className="space-y-3">
           {(docs ?? []).length === 0 && (
-            <p className="rounded-xl bg-slate-50 p-4 text-center text-sm text-slate-400">No documents uploaded yet.</p>
+            <p className="rounded-xl bg-slate-50 dark:bg-slate-900 p-4 text-center text-sm text-slate-400 dark:text-slate-500">No documents uploaded yet.</p>
           )}
           {docs?.map((doc) => (
             <DocRow key={doc.id} doc={doc} admin={admin} />
@@ -85,10 +85,10 @@ export function VerificationReviewModal({ student, open, onClose }: { student: S
         </div>
 
         {/* Decision */}
-        <div className="border-t border-slate-100 pt-4">
+        <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
           {!rejecting ? (
             <>
-              <p className="mb-2 text-sm font-medium text-slate-700">Issue badge tier</p>
+              <p className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-200">Issue badge tier</p>
               <div className="mb-4 flex gap-2">
                 {TIERS.map((t) => (
                   <button
@@ -96,7 +96,7 @@ export function VerificationReviewModal({ student, open, onClose }: { student: S
                     onClick={() => setTier(t.tier)}
                     className={cn(
                       'flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition',
-                      tier === t.tier ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600',
+                      tier === t.tier ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300',
                     )}
                   >
                     {t.label}
@@ -136,13 +136,13 @@ function DocRow({ doc, admin }: { doc: DocumentRecord; admin: { id: string; name
   const isImage = doc.dataUrl.startsWith('data:image')
 
   return (
-    <div className={cn('rounded-xl border p-3', doc.status === 'approved' ? 'border-emerald-200 bg-emerald-50/40' : doc.status === 'rejected' ? 'border-red-200 bg-red-50/40' : 'border-slate-200')}>
+    <div className={cn('rounded-xl border p-3', doc.status === 'approved' ? 'border-emerald-200 bg-emerald-50/40' : doc.status === 'rejected' ? 'border-red-200 bg-red-50/40' : 'border-slate-200 dark:border-slate-800')}>
       <div className="flex items-center gap-3">
         <a href={doc.dataUrl} target="_blank" rel="noreferrer" className="group relative">
           {isImage ? (
-            <img src={doc.dataUrl} alt={doc.label} className="h-14 w-14 rounded-lg border border-slate-200 object-cover" />
+            <img src={doc.dataUrl} alt={doc.label} className="h-14 w-14 rounded-lg border border-slate-200 dark:border-slate-800 object-cover" />
           ) : (
-            <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-400">
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500">
               <FileText className="h-6 w-6" />
             </div>
           )}
@@ -151,8 +151,8 @@ function DocRow({ doc, admin }: { doc: DocumentRecord; admin: { id: string; name
           </span>
         </a>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-slate-800">{doc.label}</p>
-          <p className="truncate text-xs text-slate-400">{doc.fileName}</p>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{doc.label}</p>
+          <p className="truncate text-xs text-slate-400 dark:text-slate-500">{doc.fileName}</p>
           <div className="mt-1"><StatusPill status={doc.status} /></div>
         </div>
         {doc.status !== 'approved' && (

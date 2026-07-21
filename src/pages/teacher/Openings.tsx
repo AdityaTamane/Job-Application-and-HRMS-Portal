@@ -35,8 +35,8 @@ export function Openings() {
         <Card className="mb-6 border-brand-200 bg-brand-50/50">
           <CardBody className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm text-slate-500">Your application for</p>
-              <p className="text-lg font-bold text-slate-900">{applicant.subject}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Your application for</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">{applicant.subject}</p>
             </div>
             <div className="flex items-center gap-3">
               <StatusPill status={applicant.stage} />
@@ -55,12 +55,12 @@ export function Openings() {
       </div>
 
       {/* Subjects */}
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Subjects we're hiring for</h3>
+      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Subjects we're hiring for</h3>
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {SUBJECTS.map((s) => (
           <div key={s.name} className="card flex items-center gap-3 p-4">
             <span className="rounded-xl bg-beacon-50 p-2.5 text-beacon-600"><s.icon className="h-5 w-5" /></span>
-            <span className="font-medium text-slate-800">{s.name}</span>
+            <span className="font-medium text-slate-800 dark:text-slate-100">{s.name}</span>
           </div>
         ))}
       </div>
@@ -69,8 +69,8 @@ export function Openings() {
       <div className="grid gap-4 sm:grid-cols-3">
         {PERKS.map((p) => (
           <div key={p.title} className="card p-5">
-            <h4 className="font-semibold text-slate-900">{p.title}</h4>
-            <p className="mt-1 text-sm text-slate-500">{p.desc}</p>
+            <h4 className="font-semibold text-slate-900 dark:text-slate-100">{p.title}</h4>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{p.desc}</p>
           </div>
         ))}
       </div>

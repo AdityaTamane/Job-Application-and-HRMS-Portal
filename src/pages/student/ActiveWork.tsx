@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/Button'
 import { StatusPill } from '@/components/ui/Badge'
 import { WorkSessionGate } from '@/components/work/WorkSessionGate'
 import { WorkTrackingPanel } from '@/components/work/WorkTrackingPanel'
+import { ChatButton } from '@/components/chat/ChatButton'
 import { formatDateTime } from '@/lib/utils'
 
 const READY = ['accepted', 'verifying']
@@ -60,24 +61,27 @@ export function ActiveWork() {
       {/* Ready to start */}
       {ready.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Ready to start ({ready.length})</h2>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Ready to start ({ready.length})</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {ready.map((job) => (
               <div key={job.id} className="card p-4">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-slate-900">{job.title}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
                   <StatusPill status={job.status} />
                 </div>
-                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-1"><CalendarClock className="h-3.5 w-3.5" /> {formatDateTime(job.scheduledAt)}</span>
                   <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {job.address || job.neighbourhood}</span>
                 </div>
                 <div className="mt-3 flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
                   <ShieldCheck className="h-4 w-4" /> Requires selfie, mic, OTP & location check to start
                 </div>
-                <Button className="mt-3 w-full" icon={<PlayCircle className="h-4 w-4" />} onClick={() => startGate(job)}>
-                  Start work
-                </Button>
+                <div className="mt-3 flex gap-2">
+                  <Button className="flex-1" icon={<PlayCircle className="h-4 w-4" />} onClick={() => startGate(job)}>
+                    Start work
+                  </Button>
+                  <ChatButton job={job} size="md" label="Customer" />
+                </div>
               </div>
             ))}
           </div>

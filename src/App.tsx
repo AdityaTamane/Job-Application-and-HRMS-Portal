@@ -24,6 +24,7 @@ const StudentDashboard = named(() => import('@/pages/student/Dashboard'), 'Stude
 const FindJobs = named(() => import('@/pages/student/FindJobs'), 'FindJobs')
 const ActiveWork = named(() => import('@/pages/student/ActiveWork'), 'ActiveWork')
 const Verification = named(() => import('@/pages/student/Verification'), 'Verification')
+const Skills = named(() => import('@/pages/student/Skills'), 'Skills')
 const Earnings = named(() => import('@/pages/student/Earnings'), 'Earnings')
 const StudentProfile = named(() => import('@/pages/student/Profile'), 'StudentProfile')
 const AdminOverview = named(() => import('@/pages/admin/Overview'), 'AdminOverview')
@@ -31,6 +32,7 @@ const AdminVerification = named(() => import('@/pages/admin/Verification'), 'Adm
 const AdminStudents = named(() => import('@/pages/admin/Students'), 'AdminStudents')
 const AdminJobs = named(() => import('@/pages/admin/Jobs'), 'AdminJobs')
 const AdminHiring = named(() => import('@/pages/admin/Hiring'), 'AdminHiring')
+const AdminIncidents = named(() => import('@/pages/admin/Incidents'), 'AdminIncidents')
 const AdminAudit = named(() => import('@/pages/admin/Audit'), 'AdminAudit')
 const Openings = named(() => import('@/pages/teacher/Openings'), 'Openings')
 const MyApplication = named(() => import('@/pages/teacher/MyApplication'), 'MyApplication')
@@ -65,6 +67,7 @@ export default function App() {
               <Route path="jobs" element={<FindJobs />} />
               <Route path="active" element={<ActiveWork />} />
               <Route path="verification" element={<Verification />} />
+              <Route path="skills" element={<Skills />} />
               <Route path="earnings" element={<Earnings />} />
               <Route path="profile" element={<StudentProfile />} />
             </Route>
@@ -82,6 +85,7 @@ export default function App() {
               <Route path="students" element={<AdminStudents />} />
               <Route path="jobs" element={<AdminJobs />} />
               <Route path="hiring" element={<AdminHiring />} />
+              <Route path="incidents" element={<AdminIncidents />} />
               <Route path="audit" element={<AdminAudit />} />
             </Route>
 

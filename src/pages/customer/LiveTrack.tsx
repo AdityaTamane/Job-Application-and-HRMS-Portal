@@ -58,16 +58,16 @@ export function LiveTrack() {
             const elapsed = session ? liveElapsed(session) : 0
             return (
               <div key={job.id} className="card overflow-hidden">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 p-4">
                   <div className="flex items-center gap-3">
                     {student && <Avatar src={student.photoUrl} name={student.name} size={44} />}
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-slate-900">{job.title}</h3>
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
                         <StatusPill status={job.status} />
                       </div>
                       {student && (
-                        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-500">
+                        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
                           {student.name}
                           {student.badgeTier !== 'none' && <VerifiedBadge tier={student.badgeTier} showLabel={false} size="sm" />}
                           <a href={`tel:${student.phone}`} className="ml-1 inline-flex items-center gap-1 text-brand-600 hover:underline">
@@ -119,25 +119,37 @@ export function LiveTrack() {
                       </div>
                     )}
 
-                    <div className="rounded-xl border border-slate-100 p-3 text-sm">
-                      <p className="flex items-center gap-2 text-slate-600"><MapPin className="h-4 w-4 text-beacon-500" /> {job.address || job.neighbourhood}</p>
+                    <div className="rounded-xl border border-slate-100 dark:border-slate-800 p-3 text-sm">
+                      <p className="flex items-center gap-2 text-slate-600 dark:text-slate-300"><MapPin className="h-4 w-4 text-beacon-500" /> {job.address || job.neighbourhood}</p>
                     </div>
 
                     {/* verify-in selfie — customer can confirm who showed up */}
                     {session?.selfieDataUrl && (
-                      <div className="flex items-center gap-3 rounded-xl border border-slate-100 p-3">
+                      <div className="flex items-center gap-3 rounded-xl border border-slate-100 dark:border-slate-800 p-3">
                         <img src={session.selfieDataUrl} alt="Pro verify-in selfie" className="h-14 w-14 rounded-lg object-cover ring-2 ring-emerald-200" />
-                        <div>
-                          <p className="text-sm font-medium text-slate-800">Verified in with a live selfie</p>
-                          <p className="text-xs text-slate-500">Confirm this matches the person at your door.</p>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-100">Verified in with a live selfie</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">AI liveness check passed on the pro's device.</p>
+                          <div className="mt-1 flex flex-wrap gap-1.5">
+                            {typeof session.livenessScore === 'number' && (
+                              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                                Liveness {session.livenessScore}%
+                              </span>
+                            )}
+                            {typeof session.faceMatchScore === 'number' && (
+                              <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">
+                                Face match {session.faceMatchScore}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
 
                     {/* verification status chips */}
                     {session && (
-                      <div className="space-y-1.5 rounded-xl border border-slate-100 p-3">
-                        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">Verification</p>
+                      <div className="space-y-1.5 rounded-xl border border-slate-100 dark:border-slate-800 p-3">
+                        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">Verification</p>
                         <Chip ok={session.selfieVerified} label="Selfie captured" />
                         <Chip ok={session.micGranted} label="Mic access" />
                         <Chip ok={session.otpVerified} label="OTP confirmed" />
@@ -159,7 +171,7 @@ function Chip({ ok, label }: { ok: boolean; label: string }) {
   return (
     <div className="flex items-center gap-2 text-sm">
       <span className={`h-2 w-2 rounded-full ${ok ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-      <span className={ok ? 'text-slate-700' : 'text-slate-400'}>{label}</span>
+      <span className={ok ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500'}>{label}</span>
     </div>
   )
 }

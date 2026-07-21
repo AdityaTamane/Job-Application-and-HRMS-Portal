@@ -68,7 +68,7 @@ export function GeofenceCheck({
         height={260}
       />
 
-      <div className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+      <div className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
         <MapPin className="h-4 w-4 text-beacon-500" />
         <span className="flex-1">{job.address}</span>
       </div>

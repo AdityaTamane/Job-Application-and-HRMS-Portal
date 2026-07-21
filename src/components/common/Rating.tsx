@@ -33,8 +33,8 @@ export function Rating({
           </button>
         ))}
       </div>
-      {value > 0 && <span className="text-xs font-medium text-slate-600">{value.toFixed(1)}</span>}
-      {count !== undefined && count > 0 && <span className="text-xs text-slate-400">({count})</span>}
+      {value > 0 && <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{value.toFixed(1)}</span>}
+      {count !== undefined && count > 0 && <span className="text-xs text-slate-400 dark:text-slate-500">({count})</span>}
     </div>
   )
 }

@@ -56,7 +56,7 @@ export function Earnings() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wide text-slate-400">
+                  <tr className="border-b border-slate-100 dark:border-slate-800 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
                     <th className="pb-2 font-medium">Job</th>
                     <th className="pb-2 font-medium">Date</th>
                     <th className="pb-2 text-right font-medium">Amount</th>
@@ -65,8 +65,8 @@ export function Earnings() {
                 <tbody>
                   {completed.map((j) => (
                     <tr key={j.id} className="border-b border-slate-50">
-                      <td className="py-3 font-medium text-slate-800">{j.title}</td>
-                      <td className="py-3 text-slate-500">{formatDate(j.scheduledAt)}</td>
+                      <td className="py-3 font-medium text-slate-800 dark:text-slate-100">{j.title}</td>
+                      <td className="py-3 text-slate-500 dark:text-slate-400">{formatDate(j.scheduledAt)}</td>
                       <td className="py-3 text-right font-semibold text-emerald-600">{formatCurrency(j.estimatedPrice)}</td>
                     </tr>
                   ))}

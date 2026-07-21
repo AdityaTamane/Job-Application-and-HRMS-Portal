@@ -10,14 +10,14 @@ const OPTIONS: { value: Availability; label: string; dot: string }[] = [
 
 export function AvailabilityToggle({ student }: { student: Student }) {
   return (
-    <div className="inline-flex rounded-xl bg-slate-100 p-1">
+    <div className="inline-flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
       {OPTIONS.map((o) => (
         <button
           key={o.value}
           onClick={() => setAvailability(student, o.value)}
           className={cn(
             'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition',
-            student.availability === o.value ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700',
+            student.availability === o.value ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200',
           )}
         >
           <span className={cn('h-2 w-2 rounded-full', o.dot)} /> {o.label}

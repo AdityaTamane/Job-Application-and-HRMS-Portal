@@ -17,8 +17,8 @@ export function Logo({ size = 32, withText = true, className }: { size?: number;
       </svg>
       {withText && (
         <div className="leading-tight">
-          <span className="block text-[15px] font-extrabold tracking-tight text-brand-900">Lighthouse</span>
-          <span className="block text-[10px] font-medium uppercase tracking-wider text-beacon-600">Academy Works</span>
+          <span className="gradient-text block text-[15px] font-extrabold tracking-tight">Lighthouse</span>
+          <span className="block text-[10px] font-medium uppercase tracking-wider text-beacon-600 dark:text-beacon-400">Academy Works</span>
         </div>
       )}
     </div>

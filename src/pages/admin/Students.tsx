@@ -40,7 +40,7 @@ export function AdminStudents() {
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <Input className="pl-9" placeholder="Search by name or area…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select value={status} onChange={(e) => setStatus(e.target.value as VerificationStatus | 'all')} className="sm:w-48">
@@ -58,7 +58,7 @@ export function AdminStudents() {
         <Card className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-400">
+              <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Student</th>
                   <th className="px-4 py-3 font-medium">Area</th>
@@ -71,19 +71,19 @@ export function AdminStudents() {
               </thead>
               <tbody>
                 {filtered.map((s) => (
-                  <tr key={s.id} className="border-t border-slate-100 hover:bg-slate-50/50">
+                  <tr key={s.id} className="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar src={s.photoUrl} name={s.name} size={36} />
                         <div>
-                          <p className="font-medium text-slate-800">{s.name}</p>
-                          <p className="text-xs text-slate-400">{s.academyBatch}</p>
+                          <p className="font-medium text-slate-800 dark:text-slate-100">{s.name}</p>
+                          <p className="text-xs text-slate-400 dark:text-slate-500">{s.academyBatch}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{s.neighbourhood}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{s.neighbourhood}</td>
                     <td className="px-4 py-3"><Rating value={s.rating} count={s.ratingCount} size={12} /></td>
-                    <td className="px-4 py-3 text-slate-600">{s.jobsCompleted}</td>
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{s.jobsCompleted}</td>
                     <td className="px-4 py-3"><StatusPill status={s.verificationStatus} /></td>
                     <td className="px-4 py-3">
                       {s.verificationStatus === 'verified' ? (

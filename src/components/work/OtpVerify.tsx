@@ -46,7 +46,7 @@ export function OtpVerify({ expected, onVerified }: { expected: string; onVerifi
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
         <KeyRound className="h-7 w-7" />
       </div>
-      <p className="mt-4 max-w-xs text-sm text-slate-600">
+      <p className="mt-4 max-w-xs text-sm text-slate-600 dark:text-slate-300">
         Ask the customer for the 6-digit code shown on their tracking screen, then enter it below.
       </p>
 
@@ -61,14 +61,14 @@ export function OtpVerify({ expected, onVerified }: { expected: string; onVerifi
             onChange={(e) => setDigit(i, e.target.value)}
             onKeyDown={(e) => onKey(i, e)}
             className={`h-12 w-11 rounded-xl border text-center text-xl font-bold outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 ${
-              error ? 'border-red-400 bg-red-50' : 'border-slate-300'
+              error ? 'border-red-400 bg-red-50' : 'border-slate-300 dark:border-slate-700'
             }`}
           />
         ))}
       </div>
 
-      <div className="mt-3 flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-500">
-        <Info className="h-3.5 w-3.5" /> Demo code (shown on customer screen): <span className="font-mono font-semibold text-slate-700">{expected}</span>
+      <div className="mt-3 flex items-center gap-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <Info className="h-3.5 w-3.5" /> Demo code (shown on customer screen): <span className="font-mono font-semibold text-slate-700 dark:text-slate-200">{expected}</span>
       </div>
 
       <Button className="mt-5 w-full max-w-xs" disabled={digits.some((d) => !d)} icon={<Check className="h-4 w-4" />} onClick={verify}>

@@ -49,14 +49,14 @@ export function WorkTrackingPanel({ session, job }: { session: WorkSession; job:
 
   return (
     <div className="card overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 p-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-slate-900">{job.title}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
             <StatusPill status={job.status} />
             {session.sosTriggered && <StatusPill status="rejected" />}
           </div>
-          <p className="mt-0.5 text-xs text-slate-500">{job.address || job.neighbourhood}</p>
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{job.address || job.neighbourhood}</p>
         </div>
         <div className="flex items-center gap-2 rounded-xl bg-brand-900 px-4 py-2 text-white">
           <Clock className="h-4 w-4 text-beacon-400" />
@@ -66,7 +66,7 @@ export function WorkTrackingPanel({ session, job }: { session: WorkSession; job:
 
       <div className="p-4">
         <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-brand-600">
-          <Radio className={`h-3.5 w-3.5 ${session.status === 'active' ? 'animate-pulse text-emerald-500' : 'text-slate-400'}`} />
+          <Radio className={`h-3.5 w-3.5 ${session.status === 'active' ? 'animate-pulse text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`} />
           {session.status === 'active' ? 'Live location sharing active' : 'Location sharing paused'}
         </div>
         <LiveMap
@@ -90,7 +90,7 @@ export function WorkTrackingPanel({ session, job }: { session: WorkSession; job:
       </div>
 
       <Modal open={sosOpen} onClose={() => setSosOpen(false)} title="Raise an SOS?" size="sm">
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           This immediately alerts the Lighthouse safety team and the customer with your live location. Use only in an
           emergency.
         </p>

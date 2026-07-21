@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/Button'
 
 export function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-6 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 p-6 text-center">
       <Logo />
       <p className="mt-8 text-7xl font-extrabold text-brand-900">404</p>
-      <h1 className="mt-2 text-xl font-bold text-slate-800">Page not found</h1>
-      <p className="mt-1 max-w-sm text-sm text-slate-500">
+      <h1 className="mt-2 text-xl font-bold text-slate-800 dark:text-slate-100">Page not found</h1>
+      <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">
         The page you're looking for doesn't exist or may have moved.
       </p>
       <Link to="/" className="mt-6">

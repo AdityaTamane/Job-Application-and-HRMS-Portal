@@ -70,7 +70,7 @@ export function Login() {
   return (
     <div className="grid min-h-full lg:grid-cols-2">
       {/* Brand panel */}
-      <div className="relative hidden flex-col justify-between bg-gradient-to-br from-brand-900 to-brand-700 p-12 text-white lg:flex">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 p-12 text-white lg:flex">
         <Link to="/">
           <Logo className="[&_span]:text-white [&_.text-beacon-600]:text-beacon-300" />
         </Link>
@@ -84,29 +84,29 @@ export function Login() {
       </div>
 
       {/* Form panel */}
-      <div className="flex items-center justify-center bg-slate-50 p-6">
+      <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="mb-6 lg:hidden">
             <Link to="/"><Logo /></Link>
           </div>
           {twoFA ? (
             <div>
-              <button onClick={() => setTwoFA(null)} className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-600">
+              <button onClick={() => setTwoFA(null)} className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-brand-600">
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
               <div className="mb-2 flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-brand-600" />
-                <h1 className="text-xl font-bold text-slate-900">Two-factor verification</h1>
+                <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Two-factor verification</h1>
               </div>
-              <p className="mb-5 text-sm text-slate-500">
+              <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">
                 Admin accounts require a second factor. We sent a 6-digit code to <span className="font-medium">{twoFA.user.email}</span>.
               </p>
               <OtpVerify expected={twoFA.code} onVerified={complete2FA} />
             </div>
           ) : (
           <>
-          <h1 className="text-2xl font-bold text-slate-900">Log in</h1>
-          <p className="mt-1 text-sm text-slate-500">Welcome back to Lighthouse.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Log in</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Welcome back to Lighthouse.</p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
             <Field label="Email" required>
@@ -118,13 +118,13 @@ export function Login() {
             <Button type="submit" className="w-full" loading={loading}>Log in</Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-slate-500">
+          <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
             New here?{' '}
             <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create an account</Link>
           </p>
 
-          <div className="my-6 flex items-center gap-3 text-xs text-slate-400">
-            <div className="h-px flex-1 bg-slate-200" /> QUICK DEMO LOGIN <div className="h-px flex-1 bg-slate-200" />
+          <div className="my-6 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" /> QUICK DEMO LOGIN <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
           </div>
           <div className="grid grid-cols-3 gap-2">
             {DEMO.map((d) => (
@@ -132,14 +132,14 @@ export function Login() {
                 key={d.id}
                 onClick={() => quick(d.id)}
                 title={d.desc}
-                className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-3 text-center transition hover:border-brand-300 hover:bg-brand-50"
+                className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 text-center transition hover:border-brand-300 hover:bg-brand-50"
               >
                 <d.icon className="h-5 w-5 text-brand-600" />
-                <span className="text-xs font-medium text-slate-700">{d.label}</span>
+                <span className="text-xs font-medium text-slate-700 dark:text-slate-200">{d.label}</span>
               </button>
             ))}
           </div>
-          <div className="mt-3 flex items-center justify-center gap-4 text-xs text-slate-400">
+          <div className="mt-3 flex items-center justify-center gap-4 text-xs text-slate-400 dark:text-slate-500">
             <Link to="/register?role=teacher" className="inline-flex items-center gap-1 hover:text-brand-600">
               <Users className="h-3.5 w-3.5" /> Apply to teach
             </Link>

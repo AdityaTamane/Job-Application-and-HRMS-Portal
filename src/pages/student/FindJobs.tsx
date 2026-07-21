@@ -64,7 +64,7 @@ export function FindJobs() {
       )}
 
       <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Requests for you ({assigned.length})
         </h2>
         {assigned.length === 0 ? (
@@ -88,7 +88,7 @@ export function FindJobs() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
           Open requests near you ({open.length})
         </h2>
         {open.length === 0 ? (

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
-import { CalendarClock, MapPin, Receipt, Radar, Star, RotateCcw, XCircle, CalendarCheck } from 'lucide-react'
+import { CalendarClock, MapPin, Receipt, Radar, Star, RotateCcw, XCircle, CalendarCheck, Flag } from 'lucide-react'
 import { db } from '@/lib/db'
 import { useAuth } from '@/lib/auth'
 import { cancelBooking } from '@/lib/marketplace'
@@ -15,6 +15,8 @@ import { VerifiedBadge } from '@/components/common/VerifiedBadge'
 import { Rating } from '@/components/common/Rating'
 import { BookingModal } from '@/components/marketplace/BookingModal'
 import { RateBookingModal } from '@/components/marketplace/RateBookingModal'
+import { ChatButton } from '@/components/chat/ChatButton'
+import { ReportIssueModal } from '@/components/marketplace/ReportIssueModal'
 import { toast } from '@/components/ui/toast'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 
@@ -34,6 +36,7 @@ export function Bookings() {
   const [tab, setTab] = useState('upcoming')
   const [rebook, setRebook] = useState<Student | null>(null)
   const [rating, setRating] = useState<Job | null>(null)
+  const [reporting, setReporting] = useState<Job | null>(null)
 
   const groups = useMemo(() => {
     const all = jobs ?? []
@@ -90,20 +93,20 @@ export function Bookings() {
                     {student ? (
                       <Avatar src={student.photoUrl} name={student.name} size={48} />
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">?</div>
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500">?</div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-slate-900">{job.title}</h3>
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
                         <StatusPill status={job.status} />
                       </div>
                       {student && (
-                        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-500">
+                        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
                           {student.name}
                           {student.badgeTier !== 'none' && <VerifiedBadge tier={student.badgeTier} showLabel={false} size="sm" />}
                         </p>
                       )}
-                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                         <span className="flex items-center gap-1"><CalendarClock className="h-3.5 w-3.5" /> {formatDateTime(job.scheduledAt)}</span>
                         <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {job.address || job.neighbourhood}</span>
                         <span className="flex items-center gap-1"><Receipt className="h-3.5 w-3.5" /> {formatCurrency(job.estimatedPrice)}</span>
@@ -115,6 +118,7 @@ export function Bookings() {
                   </div>
 
                   <div className="flex shrink-0 flex-wrap gap-2">
+                    {student && job.status !== 'cancelled' && job.status !== 'declined' && <ChatButton job={job} />}
                     {ACTIVE.includes(job.status) && (
                       <Link to="/customer/track">
                         <Button size="sm" icon={<Radar className="h-4 w-4" />}>Track live</Button>
@@ -135,6 +139,11 @@ export function Bookings() {
                         Cancel
                       </Button>
                     )}
+                    {(job.status === 'completed' || job.status === 'in_progress') && (
+                      <Button size="sm" variant="ghost" className="text-slate-500" icon={<Flag className="h-4 w-4" />} onClick={() => setReporting(job)}>
+                        Report
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -145,6 +154,14 @@ export function Bookings() {
 
       <BookingModal student={rebook} open={!!rebook} onClose={() => setRebook(null)} onBooked={() => setTab('upcoming')} />
       <RateBookingModal job={rating} open={!!rating} onClose={() => setRating(null)} />
+      {reporting && (
+        <ReportIssueModal
+          job={reporting}
+          againstName={reporting.studentId ? studentMap.get(reporting.studentId)?.name : undefined}
+          open={!!reporting}
+          onClose={() => setReporting(null)}
+        />
+      )}
     </div>
   )
 }

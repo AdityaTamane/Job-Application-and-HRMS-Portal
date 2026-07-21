@@ -44,7 +44,7 @@ export function Employees() {
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
           <Input className="pl-9" placeholder="Search by name or role…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select value={dept} onChange={(e) => setDept(e.target.value)} className="sm:w-48">
@@ -62,22 +62,22 @@ export function Employees() {
               <div className="flex items-start gap-3">
                 <Avatar name={e.name} size={48} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-slate-900">{e.name}</p>
-                  <p className="truncate text-sm text-slate-500">{e.designation}</p>
+                  <p className="truncate font-semibold text-slate-900 dark:text-slate-100">{e.name}</p>
+                  <p className="truncate text-sm text-slate-500 dark:text-slate-400">{e.designation}</p>
                   <div className="mt-1 flex items-center gap-2">
                     <Badge tone="blue">{e.department}</Badge>
                     <StatusPill status={e.status} />
                   </div>
                 </div>
               </div>
-              <div className="mt-3 space-y-1 text-xs text-slate-500">
+              <div className="mt-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
                 <p className="flex items-center gap-1.5"><Mail className="h-3.5 w-3.5" /> {e.email}</p>
                 <p className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {e.phone}</p>
               </div>
-              <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+              <div className="mt-3 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-3">
                 <div>
-                  <p className="text-xs text-slate-400">Joined {formatDate(e.joinDate)}</p>
-                  <p className="text-sm font-semibold text-slate-700">{formatCurrency(e.monthlySalary)}/mo</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Joined {formatDate(e.joinDate)}</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{formatCurrency(e.monthlySalary)}/mo</p>
                 </div>
                 <Button size="sm" variant="outline" onClick={() => openEdit(e)}>Edit</Button>
               </div>

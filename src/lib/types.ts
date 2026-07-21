@@ -70,7 +70,31 @@ export interface Student {
   ratingCount: number
   jobsCompleted: number
   verifiedAt?: number
+  // Skill assessments & gamification (feature #6)
+  certificateCount?: number
+  certifiedCategoryIds?: string[]
+  skillPoints?: number
+  // Weekly availability: weekday (0=Sun..6=Sat, as string) → allowed slot times ("HH:mm")
+  weeklyAvailability?: Record<string, string[]>
   createdAt: number
+}
+
+// ---------------------------------------------------------------------------
+// Skill assessments & certificates (feature #6)
+// ---------------------------------------------------------------------------
+
+export interface AssessmentResult {
+  id: string
+  studentId: string
+  quizId: string
+  quizTitle: string
+  skill: string
+  categoryId?: string
+  score: number // 0..100
+  correct: number
+  total: number
+  passed: boolean
+  takenAt: number
 }
 
 // ---------------------------------------------------------------------------
@@ -136,6 +160,8 @@ export interface WorkSession {
   // pre-work verification gate
   selfieDataUrl?: string
   selfieVerified: boolean
+  livenessScore?: number // 0..100, on-device liveness confidence (feature #1)
+  faceMatchScore?: number | null // 0..100 vs profile photo, null if no reference
   micGranted: boolean
   otp?: string
   otpVerified: boolean
@@ -274,5 +300,50 @@ export interface AuditLog {
   action: string
   target: string
   meta?: string
+  createdAt: number
+}
+
+// ---------------------------------------------------------------------------
+// Incident & dispute center
+// ---------------------------------------------------------------------------
+
+export type IncidentType = 'sos' | 'dispute' | 'complaint'
+export type IncidentStatus = 'open' | 'investigating' | 'resolved' | 'dismissed'
+export type IncidentPriority = 'high' | 'medium' | 'low'
+
+export interface IncidentCase {
+  id: string
+  type: IncidentType
+  jobId?: string
+  raisedById: string
+  raisedByName: string
+  raisedByRole: Role
+  againstName?: string // the other party involved
+  subject: string
+  description: string
+  status: IncidentStatus
+  priority: IncidentPriority
+  lat?: number
+  lng?: number
+  resolutionNote?: string
+  createdAt: number
+  updatedAt: number
+}
+
+// ---------------------------------------------------------------------------
+// In-app chat (feature #5)
+// ---------------------------------------------------------------------------
+
+export interface ChatMessage {
+  id: string
+  threadId: string // deterministic per booking/pair (see chat.ts)
+  jobId?: string
+  senderId: string
+  senderName: string
+  senderRole: Role
+  recipientId: string
+  recipientName: string
+  text: string
+  readAt?: number
   createdAt: number
 }

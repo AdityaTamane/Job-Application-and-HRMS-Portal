@@ -29,18 +29,18 @@ export function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-brand-950/40 backdrop-blur-sm" onClick={() => !hideClose && onClose()} />
-      <div className={cn('relative z-10 w-full animate-fade-in rounded-2xl bg-white shadow-lift', widths[size])}>
+      <div role="dialog" aria-modal="true" className={cn('relative z-10 flex max-h-[calc(100dvh-2rem)] w-full flex-col animate-fade-in rounded-2xl bg-white shadow-lift dark:bg-slate-900 dark:ring-1 dark:ring-slate-800', widths[size])}>
         {(title || !hideClose) && (
-          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-            <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+          <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
             {!hideClose && (
-              <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+              <button onClick={onClose} aria-label="Close dialog" className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200">
                 <X className="h-5 w-5" />
               </button>
             )}
           </div>
         )}
-        <div className="max-h-[75vh] overflow-y-auto p-5">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-5">{children}</div>
       </div>
     </div>
   )

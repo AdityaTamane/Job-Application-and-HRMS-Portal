@@ -25,7 +25,7 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+        className="relative rounded-lg p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
         aria-label="Notifications"
       >
         <Bell className="h-5 w-5" />
@@ -38,8 +38,8 @@ export function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-20 w-80 animate-fade-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lift">
-            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <div className="absolute right-0 top-11 z-20 w-80 animate-fade-in overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lift">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-3">
               <span className="text-sm font-semibold">Notifications</span>
               {unread > 0 && (
                 <button onClick={markAll} className="text-xs font-medium text-brand-600 hover:underline">
@@ -48,12 +48,12 @@ export function NotificationBell() {
               )}
             </div>
             <div className="max-h-96 overflow-y-auto">
-              {!notifications?.length && <p className="px-4 py-8 text-center text-sm text-slate-400">No notifications</p>}
+              {!notifications?.length && <p className="px-4 py-8 text-center text-sm text-slate-400 dark:text-slate-500">No notifications</p>}
               {notifications?.map((n) => (
                 <div key={n.id} className={cn('border-b border-slate-50 px-4 py-3', !n.read && 'bg-brand-50/40')}>
-                  <p className="text-sm font-medium text-slate-800">{n.title}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">{n.body}</p>
-                  <p className="mt-1 text-[10px] text-slate-400">{timeAgo(n.createdAt)}</p>
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{n.title}</p>
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{n.body}</p>
+                  <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500">{timeAgo(n.createdAt)}</p>
                 </div>
               ))}
             </div>

@@ -1,9 +1,11 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { X, Plus } from 'lucide-react'
+import { X, Plus, Camera, Upload } from 'lucide-react'
 import { db } from '@/lib/db'
 import { NEIGHBOURHOODS } from '@/lib/seed'
-import { updateStudentProfile } from '@/lib/student'
+import { updateStudentProfile, fileToDataUrl } from '@/lib/student'
+import { SLOT_TIMES, WEEKDAYS_LONG, prettyTime } from '@/lib/availability'
+import { CameraCaptureModal } from '@/components/common/CameraCaptureModal'
 import { useStudent } from '@/hooks/useStudent'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { PageLoader } from '@/components/ui/misc'
@@ -26,9 +28,13 @@ export function StudentProfile() {
     neighbourhood: string
     skills: string[]
     serviceCategoryIds: string[]
+    weeklyAvailability: Record<string, string[]>
   } | null>(null)
   const [skillDraft, setSkillDraft] = useState('')
   const [saving, setSaving] = useState(false)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [cameraOpen, setCameraOpen] = useState(false)
+  const photoInput = useRef<HTMLInputElement>(null)
 
   // initialise form once student loads
   if (student && !form) {
@@ -39,10 +45,32 @@ export function StudentProfile() {
       neighbourhood: student.neighbourhood,
       skills: [...student.skills],
       serviceCategoryIds: [...student.serviceCategoryIds],
+      weeklyAvailability: student.weeklyAvailability ? { ...student.weeklyAvailability } : {},
     })
   }
 
   if (!student || !form) return <PageLoader />
+
+  const savePhoto = async (dataUrl: string) => {
+    setUploadingPhoto(true)
+    try {
+      await updateStudentProfile(student, { photoUrl: dataUrl })
+      toast.success('Profile photo updated — used for check-in face-match')
+    } finally {
+      setUploadingPhoto(false)
+    }
+  }
+
+  const onPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-selecting the same file
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image file')
+      return
+    }
+    await savePhoto(await fileToDataUrl(file))
+  }
 
   const addSkill = () => {
     const v = skillDraft.trim()
@@ -64,6 +92,13 @@ export function StudentProfile() {
     })
   }
 
+  const toggleSlot = (dow: number, time: string) => {
+    const key = String(dow)
+    const cur = form.weeklyAvailability[key] ?? []
+    const next = cur.includes(time) ? cur.filter((t) => t !== time) : [...cur, time]
+    setForm({ ...form, weeklyAvailability: { ...form.weeklyAvailability, [key]: next } })
+  }
+
   const save = async (e: FormEvent) => {
     e.preventDefault()
     const geo = NEIGHBOURHOODS[form.neighbourhood]
@@ -78,6 +113,7 @@ export function StudentProfile() {
         lng: geo.lng,
         skills: form.skills,
         serviceCategoryIds: form.serviceCategoryIds,
+        weeklyAvailability: form.weeklyAvailability,
       })
       toast.success('Profile saved')
     } finally {
@@ -92,17 +128,49 @@ export function StudentProfile() {
       <form onSubmit={save} className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1">
           <CardBody className="flex flex-col items-center text-center">
-            <Avatar src={student.photoUrl} name={student.name} size={88} />
-            <h3 className="mt-3 text-lg font-bold text-slate-900">{student.name}</h3>
-            <p className="text-sm text-slate-500">{student.email}</p>
+            <div className="group relative">
+              <Avatar src={student.photoUrl} name={student.name} size={88} />
+              <button
+                type="button"
+                onClick={() => setCameraOpen(true)}
+                aria-label="Take profile photo with camera"
+                className="absolute -bottom-1 -right-1 grid h-8 w-8 place-items-center rounded-full border-2 border-white bg-brand-600 text-white shadow-sm transition hover:bg-brand-700 dark:border-slate-900"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+            </div>
+            <input ref={photoInput} type="file" accept="image/*" className="hidden" onChange={onPhoto} />
+            <div className="mt-2 flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                icon={<Camera className="h-4 w-4" />}
+                loading={uploadingPhoto}
+                onClick={() => setCameraOpen(true)}
+              >
+                Take photo
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                icon={<Upload className="h-4 w-4" />}
+                onClick={() => photoInput.current?.click()}
+              >
+                Upload
+              </Button>
+            </div>
+            <h3 className="mt-2 text-lg font-bold text-slate-900 dark:text-slate-100">{student.name}</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{student.email}</p>
             <div className="mt-2">
               {student.badgeTier !== 'none' ? (
                 <VerifiedBadge tier={student.badgeTier} />
               ) : (
-                <span className="text-xs text-slate-400">Not verified yet</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">Not verified yet</span>
               )}
             </div>
-            <p className="mt-3 text-xs text-slate-400">{student.academyBatch} · Graduated {student.graduationDate}</p>
+            <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">{student.academyBatch} · Graduated {student.graduationDate}</p>
           </CardBody>
         </Card>
 
@@ -140,7 +208,7 @@ export function StudentProfile() {
                       onClick={() => toggleCat(c.id)}
                       className={cn(
                         'rounded-full border px-3 py-1.5 text-sm font-medium transition',
-                        on ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 text-slate-600 hover:border-slate-300',
+                        on ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300',
                       )}
                     >
                       {c.name}
@@ -158,15 +226,48 @@ export function StudentProfile() {
               {form.skills.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {form.skills.map((s) => (
-                    <span key={s} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-sm text-slate-700">
+                    <span key={s} className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-sm text-slate-700 dark:text-slate-200">
                       {s}
                       <button type="button" onClick={() => setForm({ ...form, skills: form.skills.filter((x) => x !== s) })}>
-                        <X className="h-3.5 w-3.5 text-slate-400 hover:text-red-500" />
+                        <X className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 hover:text-red-500" />
                       </button>
                     </span>
                   ))}
                 </div>
               )}
+            </Field>
+
+            <Field label="Weekly availability" hint="Pick the time slots you're available each day — customers can only book these.">
+              <div className="space-y-2">
+                {WEEKDAYS_LONG.map((dayName, dow) => {
+                  const selected = form.weeklyAvailability[String(dow)] ?? []
+                  return (
+                    <div key={dow} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <span className="w-24 shrink-0 text-sm font-medium text-slate-600 dark:text-slate-300">{dayName}</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {SLOT_TIMES.map((t) => {
+                          const on = selected.includes(t)
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => toggleSlot(dow, t)}
+                              className={cn(
+                                'rounded-lg border px-2.5 py-1 text-xs font-medium transition',
+                                on
+                                  ? 'border-brand-500 bg-brand-gradient text-white shadow-glow'
+                                  : 'border-slate-200 text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:text-slate-400',
+                              )}
+                            >
+                              {prettyTime(t)}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </Field>
 
             <div className="flex justify-end">
@@ -175,6 +276,13 @@ export function StudentProfile() {
           </CardBody>
         </Card>
       </form>
+
+      <CameraCaptureModal
+        open={cameraOpen}
+        onClose={() => setCameraOpen(false)}
+        onCapture={savePhoto}
+        title="Take your profile photo"
+      />
     </div>
   )
 }
