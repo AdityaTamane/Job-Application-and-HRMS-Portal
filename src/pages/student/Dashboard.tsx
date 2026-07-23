@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button'
 import { StatusPill } from '@/components/ui/Badge'
 import { VerifiedBadge } from '@/components/common/VerifiedBadge'
 import { AvailabilityToggle } from '@/components/student/AvailabilityToggle'
+import { ProfileStrength } from '@/components/student/ProfileStrength'
 import { StreakCard, LeaderboardCard } from '@/components/student/Gamification'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 
@@ -103,15 +104,18 @@ export function StudentDashboard() {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader title="Quick actions" />
-          <CardBody className="space-y-2">
-            <QuickLink to="/student/jobs" icon={<Inbox className="h-4 w-4" />} label="Browse job requests" />
-            <QuickLink to="/student/verification" icon={<ShieldCheck className="h-4 w-4" />} label="Verification & documents" />
-            <QuickLink to="/student/earnings" icon={<Wallet className="h-4 w-4" />} label="View earnings" />
-            <QuickLink to="/student/profile" icon={<Star className="h-4 w-4" />} label="Edit profile & skills" />
-          </CardBody>
-        </Card>
+        <div className="space-y-6">
+          <ProfileStrength student={student} compact />
+          <Card>
+            <CardHeader title="Quick actions" />
+            <CardBody className="space-y-2">
+              <QuickLink to="/student/jobs" icon={<Inbox className="h-4 w-4" />} label="Browse job requests" />
+              <QuickLink to="/student/verification" icon={<ShieldCheck className="h-4 w-4" />} label="Verification & documents" />
+              <QuickLink to="/student/earnings" icon={<Wallet className="h-4 w-4" />} label="View earnings" />
+              <QuickLink to="/student/profile" icon={<Star className="h-4 w-4" />} label="Edit profile & skills" />
+            </CardBody>
+          </Card>
+        </div>
       </div>
 
       {/* Gamification: streak + leaderboard */}

@@ -1,5 +1,6 @@
 import { db, logAudit, notify } from './db'
 import { uid } from './utils'
+import { ensureSessionForJob } from './workSession'
 import type { Availability, DocType, Job, Student } from './types'
 
 /** Required documents for a student to be eligible for verification. */
@@ -58,7 +59,9 @@ export async function updateStudentProfile(student: Student, patch: Partial<Stud
 
 export async function acceptJob(job: Job, student: Student) {
   await db.jobs.update(job.id, { status: 'accepted', studentId: student.id })
-  await notify(job.customerId, 'Booking accepted', `${student.name} accepted "${job.title}".`, 'success', '/customer/bookings')
+  // Create the start-code session now so the customer can see & share the OTP.
+  await ensureSessionForJob({ ...job, studentId: student.id }, student)
+  await notify(job.customerId, 'Booking accepted', `${student.name} accepted "${job.title}". Open Live Track to see your start code.`, 'success', '/customer/track')
   await logAudit(student.userId, student.name, 'accept_job', job.id)
 }
 
@@ -71,6 +74,8 @@ export async function declineJob(job: Job, student: Student) {
 /** Pick up an open (unassigned) request. */
 export async function pickUpJob(job: Job, student: Student) {
   await db.jobs.update(job.id, { status: 'accepted', studentId: student.id })
-  await notify(job.customerId, 'A pro accepted your request', `${student.name} will handle "${job.title}".`, 'success', '/customer/bookings')
+  // Create the start-code session now so the customer can see & share the OTP.
+  await ensureSessionForJob({ ...job, studentId: student.id }, student)
+  await notify(job.customerId, 'A pro accepted your request', `${student.name} will handle "${job.title}". Open Live Track to see your start code.`, 'success', '/customer/track')
   await logAudit(student.userId, student.name, 'pickup_job', job.id)
 }

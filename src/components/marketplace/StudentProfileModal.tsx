@@ -72,7 +72,7 @@ export function StudentProfileModal({
 
         {student.bio && <p className="text-sm text-slate-600 dark:text-slate-300">{student.bio}</p>}
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat icon={<Briefcase className="h-4 w-4" />} label="Jobs done" value={student.jobsCompleted} />
           <Stat icon={<GraduationCap className="h-4 w-4" />} label="Batch" value={student.academyBatch.replace('Batch ', '')} />
           <Stat icon={<CheckCircle2 className="h-4 w-4" />} label="Radius" value={`${student.serviceRadiusKm} km`} />

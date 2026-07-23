@@ -10,8 +10,12 @@ export async function getSessionForJob(jobId: string) {
   return db.workSessions.where('jobId').equals(jobId).first()
 }
 
-/** Get the existing pre-check/active session for a job, or create a fresh one. */
-export async function getOrCreateSession(job: Job, student: Student): Promise<WorkSession> {
+/**
+ * Ensure a pre-check session (with a start-code/OTP) exists for a job WITHOUT
+ * changing the job status. Called when a pro accepts a job so the customer can
+ * see and share the start code on their tracking screen right away.
+ */
+export async function ensureSessionForJob(job: Job, student: Student): Promise<WorkSession> {
   const existing = await getSessionForJob(job.id)
   if (existing) return existing
   const session: WorkSession = {
@@ -23,6 +27,7 @@ export async function getOrCreateSession(job: Job, student: Student): Promise<Wo
     micGranted: false,
     otp: generateOtp(),
     otpVerified: false,
+    doorstepPin: String(Math.floor(1000 + Math.random() * 9000)),
     geofenceOk: false,
     locationTrail: [],
     elapsedSeconds: 0,
@@ -30,12 +35,35 @@ export async function getOrCreateSession(job: Job, student: Student): Promise<Wo
     createdAt: Date.now(),
   }
   await db.workSessions.add(session)
+  await db.jobs.update(job.id, { workSessionId: session.id })
+  return session
+}
+
+/**
+ * Get the session for a job (creating one if needed) and mark the job as
+ * `verifying` — called when the pro opens the verification gate.
+ */
+export async function getOrCreateSession(job: Job, student: Student): Promise<WorkSession> {
+  const session = await ensureSessionForJob(job, student)
   await db.jobs.update(job.id, { workSessionId: session.id, status: 'verifying' })
   return session
 }
 
 export async function updateSession(id: string, patch: Partial<WorkSession>) {
   await db.workSessions.update(id, patch)
+}
+
+/**
+ * Customer confirms the pro at their door with the pro's short handshake PIN.
+ * Returns true on a match (and records the verification time).
+ */
+export async function verifyDoorstep(session: WorkSession, pin: string): Promise<boolean> {
+  if (!session.doorstepPin || session.doorstepPin !== pin.trim()) return false
+  await db.workSessions.update(session.id, { doorstepVerifiedAt: Date.now() })
+  const job = await db.jobs.get(session.jobId)
+  const student = await db.students.get(session.studentId)
+  if (student) await logAudit(student.userId, student.name, 'doorstep_verified', session.jobId, job?.title)
+  return true
 }
 
 /** All four gates passed → begin the timed work session. */

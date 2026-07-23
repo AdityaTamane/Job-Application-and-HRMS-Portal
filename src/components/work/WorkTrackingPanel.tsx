@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Pause, Play, Square, Siren, Clock, Radio } from 'lucide-react'
+import { Pause, Play, Square, Siren, Clock, Radio, UserCheck } from 'lucide-react'
 import type { Job, WorkSession } from '@/lib/types'
 import { appendLocation, endWork, liveElapsed, pauseWork, resumeWork, triggerSos, jitterAround } from '@/lib/workSession'
 import { LiveMap } from '@/components/map/LiveMap'
@@ -65,6 +65,14 @@ export function WorkTrackingPanel({ session, job }: { session: WorkSession; job:
       </div>
 
       <div className="p-4">
+        {session.doorstepPin && (
+          <div className="mb-3 flex items-center justify-between gap-2 rounded-lg border border-dashed border-slate-200 px-3 py-2 text-xs dark:border-slate-700">
+            <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+              <UserCheck className="h-3.5 w-3.5" /> Doorstep code {session.doorstepVerifiedAt ? '· confirmed ✓' : '(read to customer)'}
+            </span>
+            <span className="font-mono text-sm font-bold tracking-[0.3em] text-slate-800 dark:text-slate-100">{session.doorstepPin}</span>
+          </div>
+        )}
         <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-brand-600">
           <Radio className={`h-3.5 w-3.5 ${session.status === 'active' ? 'animate-pulse text-emerald-500' : 'text-slate-400 dark:text-slate-500'}`} />
           {session.status === 'active' ? 'Live location sharing active' : 'Location sharing paused'}

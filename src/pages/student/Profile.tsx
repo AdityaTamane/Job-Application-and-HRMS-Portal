@@ -14,6 +14,7 @@ import { Field, Input, Textarea, Select } from '@/components/ui/form'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 import { VerifiedBadge } from '@/components/common/VerifiedBadge'
+import { ProfileStrength } from '@/components/student/ProfileStrength'
 import { toast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 
@@ -125,8 +126,9 @@ export function StudentProfile() {
     <div>
       <PageHeader title="My Profile" subtitle="This is what customers see when they find you" />
 
-      <form onSubmit={save} className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-1">
+      <form onSubmit={save} className="grid gap-6 lg:grid-cols-3 lg:items-start">
+        <div className="space-y-6 lg:col-span-1">
+          <Card>
           <CardBody className="flex flex-col items-center text-center">
             <div className="group relative">
               <Avatar src={student.photoUrl} name={student.name} size={88} />
@@ -172,7 +174,9 @@ export function StudentProfile() {
             </div>
             <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">{student.academyBatch} · Graduated {student.graduationDate}</p>
           </CardBody>
-        </Card>
+          </Card>
+          <ProfileStrength student={student} />
+        </div>
 
         <Card className="lg:col-span-2">
           <CardHeader title="Editable details" />

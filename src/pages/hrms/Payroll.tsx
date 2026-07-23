@@ -100,7 +100,7 @@ export function Payroll() {
             <Button size="sm" variant="success" icon={<CheckCheck className="h-4 w-4" />} onClick={markAllPaid}>Mark all paid</Button>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-slate-50 dark:bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <tr>
                   <th className="px-4 py-3 font-medium">Employee</th>

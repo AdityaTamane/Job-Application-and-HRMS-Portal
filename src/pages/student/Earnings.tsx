@@ -1,15 +1,18 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Wallet, TrendingUp, Briefcase, Receipt } from 'lucide-react'
+import { Wallet, TrendingUp, Briefcase, Receipt, FileDown } from 'lucide-react'
 import { db } from '@/lib/db'
 import { useStudent } from '@/hooks/useStudent'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { PageLoader, StatCard, EmptyState } from '@/components/ui/misc'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
+import { IncomeStatement } from '@/components/student/IncomeStatement'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
 export function Earnings() {
   const student = useStudent()
+  const [statementOpen, setStatementOpen] = useState(false)
   const completed = useLiveQuery(
     async () =>
       student
@@ -38,7 +41,20 @@ export function Earnings() {
 
   return (
     <div>
-      <PageHeader title="Earnings" subtitle="Your income from completed jobs" />
+      <PageHeader
+        title="Earnings"
+        subtitle="Your income from completed jobs"
+        actions={
+          <Button
+            variant="outline"
+            icon={<FileDown className="h-4 w-4" />}
+            disabled={!completed?.length}
+            onClick={() => setStatementOpen(true)}
+          >
+            Income statement
+          </Button>
+        }
+      />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total earned" value={formatCurrency(totals.total)} tone="green" icon={<Wallet className="h-5 w-5" />} />
@@ -76,6 +92,13 @@ export function Earnings() {
           )}
         </CardBody>
       </Card>
+
+      <IncomeStatement
+        open={statementOpen}
+        onClose={() => setStatementOpen(false)}
+        student={student}
+        jobs={completed ?? []}
+      />
     </div>
   )
 }

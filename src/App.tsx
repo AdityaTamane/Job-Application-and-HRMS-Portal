@@ -33,9 +33,15 @@ const AdminStudents = named(() => import('@/pages/admin/Students'), 'AdminStuden
 const AdminJobs = named(() => import('@/pages/admin/Jobs'), 'AdminJobs')
 const AdminHiring = named(() => import('@/pages/admin/Hiring'), 'AdminHiring')
 const AdminIncidents = named(() => import('@/pages/admin/Incidents'), 'AdminIncidents')
+const AdminRequests = named(() => import('@/pages/admin/Requests'), 'AdminRequests')
+const AdminAnnouncements = named(() => import('@/pages/admin/Announcements'), 'AdminAnnouncements')
 const AdminAudit = named(() => import('@/pages/admin/Audit'), 'AdminAudit')
+const TimeOff = named(() => import('@/pages/TimeOff'), 'TimeOff')
+const TeacherDashboard = named(() => import('@/pages/teacher/Dashboard'), 'TeacherDashboard')
 const Openings = named(() => import('@/pages/teacher/Openings'), 'Openings')
 const MyApplication = named(() => import('@/pages/teacher/MyApplication'), 'MyApplication')
+const TeacherProfile = named(() => import('@/pages/teacher/Profile'), 'TeacherProfile')
+const Payslips = named(() => import('@/pages/teacher/Payslips'), 'Payslips')
 const HrmsDashboard = named(() => import('@/pages/hrms/Dashboard'), 'HrmsDashboard')
 const Employees = named(() => import('@/pages/hrms/Employees'), 'Employees')
 const Attendance = named(() => import('@/pages/hrms/Attendance'), 'Attendance')
@@ -69,13 +75,18 @@ export default function App() {
               <Route path="verification" element={<Verification />} />
               <Route path="skills" element={<Skills />} />
               <Route path="earnings" element={<Earnings />} />
+              <Route path="timeoff" element={<TimeOff />} />
               <Route path="profile" element={<StudentProfile />} />
             </Route>
 
             {/* Teacher */}
             <Route path="/teacher" element={<RequireAuth roles={['teacher']}><AppShell /></RequireAuth>}>
-              <Route index element={<Openings />} />
+              <Route index element={<TeacherDashboard />} />
+              <Route path="openings" element={<Openings />} />
               <Route path="application" element={<MyApplication />} />
+              <Route path="timeoff" element={<TimeOff />} />
+              <Route path="payslips" element={<Payslips />} />
+              <Route path="profile" element={<TeacherProfile />} />
             </Route>
 
             {/* Admin */}
@@ -86,6 +97,8 @@ export default function App() {
               <Route path="jobs" element={<AdminJobs />} />
               <Route path="hiring" element={<AdminHiring />} />
               <Route path="incidents" element={<AdminIncidents />} />
+              <Route path="requests" element={<AdminRequests />} />
+              <Route path="announcements" element={<AdminAnnouncements />} />
               <Route path="audit" element={<AdminAudit />} />
             </Route>
 

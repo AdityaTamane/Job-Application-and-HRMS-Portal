@@ -165,6 +165,10 @@ export interface WorkSession {
   micGranted: boolean
   otp?: string
   otpVerified: boolean
+  // Doorstep identity handshake — customer confirms the pro at their door by
+  // matching the verify-in selfie and entering this short code the pro shows.
+  doorstepPin?: string
+  doorstepVerifiedAt?: number
   geofenceOk: boolean
   distanceMeters?: number
   // live tracking
@@ -250,8 +254,58 @@ export interface Attendance {
   status: AttendanceStatus
 }
 
+/**
+ * An employee-raised request to correct/regularize an attendance record for a
+ * given date (missed punch, wrong status, WFH approval). Mirrors the leave
+ * apply→approve workflow; on approval it writes through to the Attendance row.
+ */
+export type AttendanceRequestStatus = 'pending' | 'approved' | 'rejected'
+
+export interface AttendanceRequest {
+  id: string
+  employeeId: string
+  date: string // YYYY-MM-DD the correction applies to
+  requestedStatus: AttendanceStatus
+  checkIn?: string
+  checkOut?: string
+  reason: string
+  status: AttendanceRequestStatus
+  approverId?: string
+  createdAt: number
+}
+
 export type LeaveType = 'casual' | 'sick' | 'earned' | 'unpaid'
 export type LeaveStatus = 'pending' | 'approved' | 'rejected'
+
+/**
+ * A self-service leave / attendance-regularization request raised by a student
+ * (gig pro) or teacher, reviewed & approved by the admin. Keyed by the
+ * applicant's user id (they are not HRMS `Employee`s).
+ */
+export type WorkforceRequestKind = 'leave' | 'regularization'
+export type WorkforceApplicantRole = 'student' | 'teacher'
+
+export interface WorkforceRequest {
+  id: string
+  applicantId: string // user.id
+  applicantName: string
+  applicantRole: WorkforceApplicantRole
+  kind: WorkforceRequestKind
+  // leave fields
+  leaveType?: LeaveType
+  from?: string
+  to?: string
+  // regularization fields
+  date?: string
+  requestedStatus?: AttendanceStatus
+  checkIn?: string
+  checkOut?: string
+  reason: string
+  status: LeaveStatus
+  approverId?: string
+  approverName?: string
+  createdAt: number
+}
 
 export interface LeaveRequest {
   id: string
@@ -300,6 +354,20 @@ export interface AuditLog {
   action: string
   target: string
   meta?: string
+  createdAt: number
+}
+
+/** Admin broadcast to a role audience; fans out as a notification per user. */
+export type AnnouncementAudience = 'all' | 'students' | 'customers' | 'teachers'
+
+export interface Announcement {
+  id: string
+  title: string
+  body: string
+  audience: AnnouncementAudience
+  sentById: string
+  sentByName: string
+  recipientCount: number
   createdAt: number
 }
 

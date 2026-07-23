@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
-import { KeyRound, Clock, Phone, MapPin, Radar, ShieldCheck, Siren } from 'lucide-react'
+import { KeyRound, Clock, Phone, MapPin, Radar, ShieldCheck, Siren, UserCheck } from 'lucide-react'
 import { db } from '@/lib/db'
 import { useAuth } from '@/lib/auth'
-import { liveElapsed } from '@/lib/workSession'
+import { liveElapsed, verifyDoorstep } from '@/lib/workSession'
+import type { Student, WorkSession } from '@/lib/types'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { PageLoader, EmptyState } from '@/components/ui/misc'
 import { Button } from '@/components/ui/Button'
@@ -12,6 +13,7 @@ import { StatusPill } from '@/components/ui/Badge'
 import { Avatar } from '@/components/ui/Avatar'
 import { VerifiedBadge } from '@/components/common/VerifiedBadge'
 import { LiveMap } from '@/components/map/LiveMap'
+import { toast } from '@/components/ui/toast'
 import { formatDuration } from '@/lib/utils'
 
 const TRACKABLE = ['accepted', 'verifying', 'en_route', 'in_progress']
@@ -100,21 +102,24 @@ export function LiveTrack() {
                   <div className="space-y-3">
                     {/* OTP share card */}
                     {session?.otp && !session.otpVerified && (
-                      <div className="rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50 p-4 text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand-600">
+                      <div className="rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50 p-4 text-center dark:border-brand-500/50 dark:bg-brand-500/10">
+                        <div className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand-600 dark:text-brand-300">
                           <KeyRound className="h-4 w-4" /> Start code
                         </div>
-                        <p className="mt-2 font-mono text-3xl font-extrabold tracking-[0.3em] text-brand-800">{session.otp}</p>
-                        <p className="mt-2 text-xs text-brand-600">Share this with your pro when they arrive to start the job.</p>
+                        <p className="mt-2 font-mono text-3xl font-extrabold tracking-[0.3em] text-brand-800 dark:text-brand-100">{session.otp}</p>
+                        <p className="mt-2 text-xs text-brand-600 dark:text-brand-300">Share this with your pro when they arrive to start the job.</p>
                       </div>
                     )}
                     {session?.otpVerified && job.status === 'in_progress' && (
-                      <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">
+                      <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
                         <ShieldCheck className="h-5 w-5" /> Pro verified in & working
                       </div>
                     )}
+
+                    {/* Doorstep identity handshake */}
+                    {session?.doorstepPin && <DoorstepVerify session={session} student={student} />}
                     {session?.sosTriggered && (
-                      <div className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-medium text-red-700">
+                      <div className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-medium text-red-700 dark:bg-red-500/10 dark:text-red-300">
                         <Siren className="h-5 w-5" /> Safety alert active — team notified
                       </div>
                     )}
@@ -163,6 +168,54 @@ export function LiveTrack() {
           })}
         </div>
       )}
+    </div>
+  )
+}
+
+function DoorstepVerify({ session, student }: { session: WorkSession; student?: Student }) {
+  const [pin, setPin] = useState('')
+  const [error, setError] = useState(false)
+
+  if (session.doorstepVerifiedAt) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+        <UserCheck className="h-5 w-5" /> Identity confirmed at your door
+      </div>
+    )
+  }
+
+  const photo = session.selfieDataUrl ?? student?.photoUrl
+  const submit = async () => {
+    const ok = await verifyDoorstep(session, pin)
+    if (ok) toast.success('Identity confirmed', 'This is your verified pro.')
+    else { setError(true); toast.error('Code does not match', 'Ask the pro to read their doorstep code again.') }
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        <UserCheck className="h-4 w-4 text-brand-600 dark:text-brand-300" /> Confirm who's at your door
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        {photo
+          ? <img src={photo} alt="Pro" className="h-14 w-14 rounded-xl object-cover ring-2 ring-brand-200 dark:ring-brand-500/30" />
+          : <Avatar name={student?.name ?? 'Pro'} size={56} />}
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{student?.name ?? 'Your pro'}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Check the face matches, then enter their 4-digit code.</p>
+        </div>
+      </div>
+      <div className="mt-3 flex gap-2">
+        <input
+          value={pin}
+          onChange={(e) => { setPin(e.target.value.replace(/\D/g, '').slice(0, 4)); setError(false) }}
+          inputMode="numeric"
+          maxLength={4}
+          placeholder="••••"
+          className={`h-10 w-24 rounded-xl border text-center text-lg font-bold tracking-[0.4em] outline-none transition focus:ring-2 focus:ring-brand-100 dark:bg-slate-800 ${error ? 'border-red-400' : 'border-slate-300 dark:border-slate-700'}`}
+        />
+        <Button className="flex-1" disabled={pin.length !== 4} onClick={submit}>Verify pro</Button>
+      </div>
     </div>
   )
 }

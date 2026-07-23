@@ -1,4 +1,5 @@
 import { db, notify } from './db'
+import { generateOtp } from './utils'
 import type {
   User,
   Student,
@@ -7,9 +8,13 @@ import type {
   TeacherApplicant,
   Employee,
   Attendance,
+  AttendanceRequest,
+  WorkforceRequest,
+  Announcement,
   LeaveRequest,
   PayrollRecord,
   DocumentRecord,
+  WorkSession,
 } from './types'
 
 // Base city: Bengaluru. Neighbourhoods with rough coordinates.
@@ -101,6 +106,8 @@ async function runSeed(force: boolean) {
     { id: 'u_cust1', role: 'customer', name: 'Anita Desai', email: 'customer@demo.com', phone: '9000000002', password: 'demo123', avatarUrl: pravatar(45), createdAt: now },
     { id: 'u_cust2', role: 'customer', name: 'Rahul Mehta', email: 'rahul@demo.com', phone: '9000000003', password: 'demo123', avatarUrl: pravatar(33), createdAt: now },
     { id: 'u_teacher', role: 'teacher', name: 'Deepa Iyer', email: 'deepa@mail.com', phone: '9811111111', password: 'demo123', avatarUrl: pravatar(48), refId: 'app_1', createdAt: now },
+    // A hired teacher — logs into the "faculty" variant of the teacher portal.
+    { id: 'u_teacher2', role: 'teacher', name: 'Rohan Nair', email: 'rohan@mail.com', phone: '9811122233', password: 'demo123', avatarUrl: pravatar(52), refId: 'emp_7', createdAt: now },
   ]
 
   // --- Students (+ their user accounts + documents) ---
@@ -177,6 +184,30 @@ async function runSeed(force: boolean) {
   ]
   await db.jobs.bulkAdd(jobs)
 
+  // --- Work sessions ---
+  // Pre-check session for the accepted job so the customer sees a start code
+  // (OTP) to share on Live Track immediately, before the pro verifies in.
+  const workSessions: WorkSession[] = [
+    {
+      id: 'ws_1',
+      jobId: 'job_1',
+      studentId: 'stu_1',
+      status: 'pre_check',
+      selfieVerified: false,
+      micGranted: false,
+      otp: generateOtp(),
+      otpVerified: false,
+      doorstepPin: '4271',
+      geofenceOk: false,
+      locationTrail: [],
+      elapsedSeconds: 0,
+      sosTriggered: false,
+      createdAt: now - 3600000,
+    },
+  ]
+  await db.workSessions.bulkAdd(workSessions)
+  await db.jobs.update('job_1', { workSessionId: 'ws_1' })
+
   // --- Teacher applicants (ATS) ---
   const applicants: TeacherApplicant[] = [
     { id: 'app_1', name: 'Deepa Iyer', email: 'deepa@mail.com', phone: '9811111111', subject: 'Mathematics', qualifications: 'M.Sc Mathematics, B.Ed', experienceYears: 6, coverNote: 'Passionate about foundational maths for underserved students.', stage: 'interview', interviews: [{ id: 'iv_1', scheduledAt: now + day, mode: 'online', interviewer: 'Lighthouse Admin', result: 'pending' }], recruiterNotes: [{ id: 'n1', author: 'Admin', text: 'Strong screening call.', at: now - day }], rating: 4, appliedAt: now - day * 6, updatedAt: now - day },
@@ -184,6 +215,7 @@ async function runSeed(force: boolean) {
     { id: 'app_3', name: 'Meera Joshi', email: 'meera@mail.com', phone: '9833333333', subject: 'English', qualifications: 'MA English, TEFL', experienceYears: 8, coverNote: 'Spoken English and communication trainer.', stage: 'offer', interviews: [{ id: 'iv_2', scheduledAt: now - day * 2, mode: 'in_person', interviewer: 'Admin', result: 'pass', notes: 'Excellent demo class.' }], recruiterNotes: [{ id: 'n2', author: 'Admin', text: 'Offer at 45k/month.', at: now - day }], rating: 5, appliedAt: now - day * 10, updatedAt: now - day },
     { id: 'app_4', name: 'Karthik Rao', email: 'karthik@mail.com', phone: '9844444444', subject: 'Vocational — Electrical', qualifications: 'Diploma EEE, 10y field', experienceYears: 10, coverNote: 'Hands-on electrical trainer.', stage: 'applied', interviews: [], recruiterNotes: [], rating: 0, appliedAt: now - 3600000 * 5, updatedAt: now - 3600000 * 5 },
     { id: 'app_5', name: 'Nisha Verma', email: 'nisha@mail.com', phone: '9855555555', subject: 'Beauty & Wellness', qualifications: 'Certified beautician, 7y', experienceYears: 7, coverNote: 'Vocational beauty trainer.', stage: 'rejected', interviews: [{ id: 'iv_3', scheduledAt: now - day * 4, mode: 'online', interviewer: 'Admin', result: 'fail', notes: 'Not enough teaching aptitude.' }], recruiterNotes: [], rating: 2, appliedAt: now - day * 12, updatedAt: now - day * 4 },
+    { id: 'app_6', name: 'Rohan Nair', email: 'rohan@mail.com', phone: '9811122233', subject: 'Computer Basics', qualifications: 'B.Tech CSE, 5y teaching', experienceYears: 5, coverNote: 'Love teaching foundational computing to first-generation learners.', stage: 'hired', interviews: [{ id: 'iv_r1', scheduledAt: now - day * 20, mode: 'in_person', interviewer: 'Lighthouse Admin', result: 'pass', notes: 'Excellent demo class.' }], recruiterNotes: [{ id: 'nr1', author: 'Admin', text: 'Hired as Computer Instructor.', at: now - day * 14 }], rating: 5, appliedAt: now - day * 30, updatedAt: now - day * 14 },
   ]
   await db.applicants.bulkAdd(applicants)
 
@@ -195,20 +227,71 @@ async function runSeed(force: boolean) {
     { id: 'emp_4', name: 'George Thomas', email: 'george@lighthouse.org', phone: '9700000004', designation: 'Placement Officer', department: 'Placements', employmentType: 'full_time', status: 'active', joinDate: '2022-11-20', monthlySalary: 52000, managerId: 'emp_1', createdAt: now },
     { id: 'emp_5', name: 'Sara Pinto', email: 'sara@lighthouse.org', phone: '9700000005', designation: 'English Trainer', department: 'Academy', employmentType: 'part_time', status: 'on_leave', joinDate: '2023-02-05', monthlySalary: 30000, managerId: 'emp_2', createdAt: now },
     { id: 'emp_6', name: 'Imran Sheikh', email: 'imran@lighthouse.org', phone: '9700000006', designation: 'Vocational Trainer', department: 'Academy', employmentType: 'contract', status: 'active', joinDate: '2024-01-08', monthlySalary: 40000, managerId: 'emp_2', createdAt: now },
+    // Hired teacher (linked to u_teacher2 / app_6) — powers the faculty portal + payslips.
+    { id: 'emp_7', userId: 'u_teacher2', name: 'Rohan Nair', email: 'rohan@mail.com', phone: '9811122233', designation: 'Computer Instructor', department: 'Academy', employmentType: 'full_time', status: 'active', joinDate: '2026-02-01', monthlySalary: 45000, managerId: 'emp_2', createdAt: now },
   ]
   await db.employees.bulkAdd(employees)
 
-  // --- Attendance (today) ---
+  // --- Attendance (this month → today) ---
   const today = new Date(now).toISOString().slice(0, 10)
-  const attendance: Attendance[] = employees.map((e, i) => ({
-    id: `att_${e.id}_${today}`,
-    employeeId: e.id,
-    date: today,
-    checkIn: e.status === 'on_leave' ? undefined : `09:${(10 + i * 3) % 60}`.padEnd(5, '0'),
-    checkOut: undefined,
-    status: e.status === 'on_leave' ? 'leave' : i === 5 ? 'wfh' : 'present',
-  }))
+  const cin = (i: number) => `09:${String((5 + i * 7) % 55).padStart(2, '0')}`
+  const cout = (i: number) => `18:${String((5 + i * 4) % 55).padStart(2, '0')}`
+  const attendance: Attendance[] = []
+  // Backfill weekdays from the 1st of the current month up to (not incl.) today.
+  const cursor = new Date(now)
+  cursor.setDate(1)
+  const todayDate = new Date(now)
+  while (cursor < todayDate) {
+    const dow = cursor.getDay()
+    if (dow !== 0 && dow !== 6) {
+      const ds = cursor.toISOString().slice(0, 10)
+      const dayNum = cursor.getDate()
+      employees.forEach((e, i) => {
+        const seed = dayNum + i * 3
+        let status: Attendance['status'] = 'present'
+        if (seed % 13 === 0) status = 'absent'
+        else if (seed % 9 === 0) status = 'leave'
+        else if (i === 5 || seed % 5 === 0) status = 'wfh'
+        const working = status === 'present' || status === 'wfh'
+        attendance.push({
+          id: `att_${e.id}_${ds}`,
+          employeeId: e.id,
+          date: ds,
+          checkIn: working ? cin(i) : undefined,
+          checkOut: working ? cout(i) : undefined,
+          status,
+        })
+      })
+    }
+    cursor.setDate(cursor.getDate() + 1)
+  }
+  // Today (open — no check-out yet).
+  employees.forEach((e, i) => {
+    attendance.push({
+      id: `att_${e.id}_${today}`,
+      employeeId: e.id,
+      date: today,
+      checkIn: e.status === 'on_leave' ? undefined : cin(i),
+      checkOut: undefined,
+      status: e.status === 'on_leave' ? 'leave' : i === 5 ? 'wfh' : 'present',
+    })
+  })
   await db.attendance.bulkAdd(attendance)
+
+  // --- Attendance regularization requests ---
+  const attendanceRequests: AttendanceRequest[] = [
+    { id: 'ar_1', employeeId: 'emp_4', date: '2026-07-20', requestedStatus: 'present', checkIn: '09:15', checkOut: '18:30', reason: 'Forgot to check out after an off-site placement drive.', status: 'pending', createdAt: now - 3600000 * 3 },
+    { id: 'ar_2', employeeId: 'emp_6', date: '2026-07-17', requestedStatus: 'wfh', checkIn: '10:00', checkOut: '18:00', reason: 'Worked from home but was marked absent.', status: 'approved', approverId: 'u_admin', createdAt: now - day * 2 },
+  ]
+  await db.attendanceRequests.bulkAdd(attendanceRequests)
+
+  // --- Student / teacher self-service leave & regularization requests ---
+  const workforceRequests: WorkforceRequest[] = [
+    { id: 'wr_1', applicantId: 'u_stu_1', applicantName: 'Priya Sharma', applicantRole: 'student', kind: 'leave', leaveType: 'casual', from: '2026-07-28', to: '2026-07-29', reason: 'Family wedding out of town.', status: 'pending', createdAt: now - 3600000 * 5 },
+    { id: 'wr_2', applicantId: 'u_teacher', applicantName: 'Deepa Iyer', applicantRole: 'teacher', kind: 'regularization', date: '2026-07-18', requestedStatus: 'present', checkIn: '09:30', checkOut: '17:45', reason: 'Missed check-in — was at an off-site school demo.', status: 'pending', createdAt: now - 3600000 * 8 },
+    { id: 'wr_3', applicantId: 'u_stu_2', applicantName: 'Arjun Reddy', applicantRole: 'student', kind: 'leave', leaveType: 'sick', from: '2026-07-15', to: '2026-07-15', reason: 'Viral fever.', status: 'approved', approverId: 'u_admin', approverName: 'Lighthouse Admin', createdAt: now - day * 6 },
+  ]
+  await db.workforceRequests.bulkAdd(workforceRequests)
 
   // --- Leaves ---
   const leaves: LeaveRequest[] = [
@@ -229,6 +312,12 @@ async function runSeed(force: boolean) {
     status: 'paid',
   }))
   await db.payroll.bulkAdd(payroll)
+
+  // --- A sample broadcast announcement (history only; no fan-out on seed) ---
+  const announcements: Announcement[] = [
+    { id: 'ann_1', title: 'Weekend demand is high 🚀', body: 'Lots of cleaning & tutoring requests expected this weekend — set yourself available to grab more jobs!', audience: 'students', sentById: 'u_admin', sentByName: 'Lighthouse Admin', recipientCount: 8, createdAt: now - day },
+  ]
+  await db.announcements.bulkAdd(announcements)
 
   // --- A couple of notifications for the demo customer ---
   await notify('u_cust1', 'Booking confirmed', 'Priya Sharma accepted your cleaning job.', 'success', '/customer/bookings')

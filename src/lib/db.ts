@@ -10,9 +10,12 @@ import type {
   TeacherApplicant,
   Employee,
   Attendance,
+  AttendanceRequest,
   LeaveRequest,
+  WorkforceRequest,
   PayrollRecord,
   Notification,
+  Announcement,
   AuditLog,
   AssessmentResult,
   ChatMessage,
@@ -29,9 +32,12 @@ export class LighthouseDB extends Dexie {
   applicants!: Table<TeacherApplicant, string>
   employees!: Table<Employee, string>
   attendance!: Table<Attendance, string>
+  attendanceRequests!: Table<AttendanceRequest, string>
+  workforceRequests!: Table<WorkforceRequest, string>
   leaves!: Table<LeaveRequest, string>
   payroll!: Table<PayrollRecord, string>
   notifications!: Table<Notification, string>
+  announcements!: Table<Announcement, string>
   audit!: Table<AuditLog, string>
   assessments!: Table<AssessmentResult, string>
   chat!: Table<ChatMessage, string>
@@ -62,6 +68,23 @@ export class LighthouseDB extends Dexie {
     // v3 — incident & dispute center.
     this.version(3).stores({
       incidents: 'id, type, status, priority, jobId, raisedById, createdAt',
+    })
+    // v4 — attendance regularization requests.
+    this.version(4).stores({
+      attendanceRequests: 'id, employeeId, status, date, createdAt',
+    })
+    // v5 — student/teacher self-service leave & regularization requests.
+    this.version(5).stores({
+      workforceRequests: 'id, applicantId, applicantRole, kind, status, createdAt',
+    })
+    // v6 — index applicants by email (used to resolve a hired teacher whose
+    // user.refId now points at their employee record, not the applicant).
+    this.version(6).stores({
+      applicants: 'id, stage, subject, email',
+    })
+    // v7 — admin broadcast announcements.
+    this.version(7).stores({
+      announcements: 'id, audience, createdAt',
     })
   }
 }

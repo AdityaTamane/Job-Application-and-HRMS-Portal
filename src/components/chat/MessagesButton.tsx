@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { MessageCircle } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
@@ -34,14 +35,17 @@ export function MessagesButton() {
           </span>
         )}
       </button>
-      {open && (
+      {open && createPortal(
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-20 w-80 animate-fade-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lift dark:border-slate-800 dark:bg-slate-900">
+          <div
+            className="fixed inset-0 z-40 bg-brand-950/40 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none"
+            onClick={() => setOpen(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 animate-fade-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lift dark:border-slate-800 dark:bg-slate-900 sm:left-auto sm:right-4 sm:top-16 sm:w-80 sm:max-w-none sm:translate-x-0 sm:translate-y-0">
             <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
               <span className="text-sm font-semibold">Messages</span>
             </div>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-[70vh] overflow-y-auto sm:max-h-96">
               {!threads.length && (
                 <p className="px-4 py-8 text-center text-sm text-slate-400 dark:text-slate-500">No conversations yet</p>
               )}
@@ -73,7 +77,8 @@ export function MessagesButton() {
               ))}
             </div>
           </div>
-        </>
+        </>,
+        document.body,
       )}
 
       {active && active.jobId && (

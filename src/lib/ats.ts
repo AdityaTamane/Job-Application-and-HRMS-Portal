@@ -30,6 +30,14 @@ export async function moveStage(applicant: TeacherApplicant, stage: ApplicationS
   await logAudit(admin.id, admin.name, 'move_applicant', applicant.id, `${applicant.stage} → ${stage}`)
 }
 
+/** Teacher edits their own applicant profile (subject, quals, experience, etc.). */
+export async function updateApplicantProfile(
+  applicant: TeacherApplicant,
+  patch: Partial<Pick<TeacherApplicant, 'phone' | 'subject' | 'qualifications' | 'experienceYears' | 'coverNote'>>,
+) {
+  await db.applicants.update(applicant.id, { ...patch, updatedAt: Date.now() })
+}
+
 export async function addNote(applicant: TeacherApplicant, author: string, text: string) {
   const note = { id: uid('note'), author, text, at: Date.now() }
   await db.applicants.update(applicant.id, { recruiterNotes: [...applicant.recruiterNotes, note], updatedAt: Date.now() })

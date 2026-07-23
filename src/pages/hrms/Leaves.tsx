@@ -108,7 +108,7 @@ export function Leaves() {
               {employees?.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
             </Select>
           </Field>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Field label="Type">
               <Select value={form.type} onChange={(e) => set('type', e.target.value)}>
                 {LEAVE_TYPES.map((t) => <option key={t} value={t} className="capitalize">{t}</option>)}

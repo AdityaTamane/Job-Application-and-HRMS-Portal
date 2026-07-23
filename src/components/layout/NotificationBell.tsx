@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Bell } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
@@ -35,10 +36,13 @@ export function NotificationBell() {
           </span>
         )}
       </button>
-      {open && (
+      {open && createPortal(
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-20 w-80 animate-fade-in overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lift">
+          <div
+            className="fixed inset-0 z-40 bg-brand-950/40 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none"
+            onClick={() => setOpen(false)}
+          />
+          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 animate-fade-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lift dark:border-slate-800 dark:bg-slate-900 sm:left-auto sm:right-4 sm:top-16 sm:w-80 sm:max-w-none sm:translate-x-0 sm:translate-y-0">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-3">
               <span className="text-sm font-semibold">Notifications</span>
               {unread > 0 && (
@@ -47,10 +51,10 @@ export function NotificationBell() {
                 </button>
               )}
             </div>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-[70vh] overflow-y-auto sm:max-h-96">
               {!notifications?.length && <p className="px-4 py-8 text-center text-sm text-slate-400 dark:text-slate-500">No notifications</p>}
               {notifications?.map((n) => (
-                <div key={n.id} className={cn('border-b border-slate-50 px-4 py-3', !n.read && 'bg-brand-50/40')}>
+                <div key={n.id} className={cn('border-b border-slate-50 px-4 py-3 dark:border-slate-800/60', !n.read && 'bg-brand-50/40 dark:bg-brand-500/10')}>
                   <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{n.title}</p>
                   <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{n.body}</p>
                   <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500">{timeAgo(n.createdAt)}</p>
@@ -58,7 +62,8 @@ export function NotificationBell() {
               ))}
             </div>
           </div>
-        </>
+        </>,
+        document.body,
       )}
     </div>
   )

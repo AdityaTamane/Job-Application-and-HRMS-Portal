@@ -1,7 +1,8 @@
 import { db, logAudit, notify } from './db'
 import { uid } from './utils'
 import type {
-  Attendance, AttendanceStatus, Employee, LeaveRequest, LeaveStatus, PayrollRecord,
+  Attendance, AttendanceRequest, AttendanceRequestStatus, AttendanceStatus,
+  Employee, LeaveRequest, LeaveStatus, PayrollRecord,
 } from './types'
 
 export function todayStr() {
@@ -47,6 +48,72 @@ export async function setAttendanceStatus(employeeId: string, date: string, stat
   const existing = await db.attendance.where('employeeId').equals(employeeId).and((a) => a.date === date).first()
   if (existing) await db.attendance.update(existing.id, { status })
   else await db.attendance.add({ id: uid('att'), employeeId, date, status })
+}
+
+/** Upsert an attendance record for an employee/date with an arbitrary patch. */
+export async function setAttendance(
+  employeeId: string,
+  date: string,
+  patch: Partial<Pick<Attendance, 'status' | 'checkIn' | 'checkOut'>>,
+) {
+  const existing = await db.attendance.where('employeeId').equals(employeeId).and((a) => a.date === date).first()
+  if (existing) await db.attendance.update(existing.id, patch)
+  else await db.attendance.add({ id: uid('att'), employeeId, date, status: patch.status ?? 'present', checkIn: patch.checkIn, checkOut: patch.checkOut })
+}
+
+/** Mark everyone not yet marked in (or currently absent) as present for a date. */
+export async function markAllPresent(employeeIds: string[], date: string) {
+  for (const id of employeeIds) {
+    const existing = await db.attendance.where('employeeId').equals(id).and((a) => a.date === date).first()
+    if (!existing || existing.status === 'absent') {
+      await setAttendance(id, date, { status: 'present', checkIn: existing?.checkIn ?? '09:00' })
+    }
+  }
+}
+
+// ---- Attendance regularization requests (apply → approve, like leaves) ----
+export async function applyAttendanceRequest(data: Omit<AttendanceRequest, 'id' | 'status' | 'createdAt'>) {
+  const id = uid('ar')
+  await db.attendanceRequests.add({ ...data, id, status: 'pending', createdAt: Date.now() })
+  const admin = await db.users.where('role').equals('admin').first()
+  if (admin) await notify(admin.id, 'Attendance regularization', 'An attendance correction is awaiting your approval.', 'action', '/hrms/attendance')
+  return id
+}
+
+export async function decideAttendanceRequest(
+  req: AttendanceRequest,
+  status: AttendanceRequestStatus,
+  admin: { id: string; name: string },
+) {
+  await db.attendanceRequests.update(req.id, { status, approverId: admin.id })
+  if (status === 'approved') {
+    await setAttendance(req.employeeId, req.date, {
+      status: req.requestedStatus,
+      checkIn: req.checkIn,
+      checkOut: req.checkOut,
+    })
+  }
+  await logAudit(admin.id, admin.name, `${status}_attendance_request`, req.id, req.date)
+}
+
+/** Per-employee tally of a month's attendance records + a working-day %. */
+export interface AttendanceSummary {
+  present: number
+  wfh: number
+  leave: number
+  absent: number
+  marked: number
+  rate: number // (present + wfh) / working days, 0–100
+}
+
+export function summarizeAttendance(records: Attendance[], workingDays: number): AttendanceSummary {
+  const present = records.filter((r) => r.status === 'present').length
+  const wfh = records.filter((r) => r.status === 'wfh').length
+  const leave = records.filter((r) => r.status === 'leave').length
+  const absent = records.filter((r) => r.status === 'absent').length
+  const marked = records.length
+  const rate = workingDays > 0 ? Math.round(((present + wfh) / workingDays) * 100) : 0
+  return { present, wfh, leave, absent, marked, rate }
 }
 
 // ---- Leaves ----

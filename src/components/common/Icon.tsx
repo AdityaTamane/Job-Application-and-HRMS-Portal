@@ -9,7 +9,7 @@ import {
   // safety / incidents
   Siren,
   // misc
-  LayoutGrid, HelpCircle, type LucideIcon, type LucideProps,
+  LayoutGrid, Inbox, Megaphone, HelpCircle, type LucideIcon, type LucideProps,
 } from 'lucide-react'
 
 // Explicit registry — importing icons by name (not `import *`) keeps the bundle
@@ -19,7 +19,7 @@ const REGISTRY: Record<string, LucideIcon> = {
   Wallet, GraduationCap, FileText, Users, UserPlus, ScrollText, CalendarClock, CalendarOff, Banknote,
   Sparkles, Zap, Wrench, Scissors, ChefHat, HeartHandshake, PaintRoller,
   Award, Trophy, MessageCircle, Search, Siren,
-  LayoutGrid,
+  LayoutGrid, Inbox, Megaphone,
 }
 
 /** Render a lucide icon by its string name (used for data-driven configs). */

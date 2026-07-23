@@ -2,12 +2,14 @@ import { Suspense, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { LogOut, Menu, X } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
-import { NAV_BY_ROLE } from './nav'
+import { useTeacherStatus } from '@/hooks/useTeacherStatus'
+import { NAV_BY_ROLE, TEACHER_NAV } from './nav'
 import { Icon } from '@/components/common/Icon'
 import { Logo } from '@/components/common/Logo'
 import { Avatar } from '@/components/ui/Avatar'
 import { PageLoader } from '@/components/ui/misc'
 import { NotificationBell } from './NotificationBell'
+import { AnnouncementBanner } from './AnnouncementBanner'
 import { ThemeToggle } from './ThemeToggle'
 import { MessagesButton } from '@/components/chat/MessagesButton'
 import { CommandPalette } from '@/components/command/CommandPalette'
@@ -18,8 +20,14 @@ export function AppShell() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const teacher = useTeacherStatus()
   if (!user) return null
-  const nav = NAV_BY_ROLE[user.role]
+  const nav =
+    user.role === 'teacher'
+      ? teacher?.hired
+        ? TEACHER_NAV.hired
+        : TEACHER_NAV.candidate
+      : NAV_BY_ROLE[user.role]
 
   const handleLogout = () => {
     logout()
@@ -107,6 +115,7 @@ export function AppShell() {
         </header>
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-7xl p-4 lg:p-6">
+            <AnnouncementBanner />
             <Suspense fallback={<PageLoader />}>
               <Outlet />
             </Suspense>

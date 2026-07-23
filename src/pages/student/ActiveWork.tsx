@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
-import { CalendarClock, MapPin, ShieldCheck, PlayCircle, Radar } from 'lucide-react'
+import { CalendarClock, MapPin, ShieldCheck, PlayCircle, Radar, UserCheck } from 'lucide-react'
 import { db } from '@/lib/db'
 import { getOrCreateSession } from '@/lib/workSession'
 import { useStudent } from '@/hooks/useStudent'
@@ -63,7 +63,9 @@ export function ActiveWork() {
         <section>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Ready to start ({ready.length})</h2>
           <div className="grid gap-4 md:grid-cols-2">
-            {ready.map((job) => (
+            {ready.map((job) => {
+              const jobSession = sessionByJob.get(job.id)
+              return (
               <div key={job.id} className="card p-4">
                 <div className="flex items-center gap-2">
                   <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
@@ -76,6 +78,14 @@ export function ActiveWork() {
                 <div className="mt-3 flex items-center gap-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
                   <ShieldCheck className="h-4 w-4" /> Requires selfie, mic, OTP & location check to start
                 </div>
+                {jobSession?.doorstepPin && (
+                  <div className="mt-2 flex items-center justify-between gap-2 rounded-lg border border-dashed border-slate-200 px-3 py-2 text-xs dark:border-slate-700">
+                    <span className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                      <UserCheck className="h-3.5 w-3.5" /> Doorstep code {jobSession.doorstepVerifiedAt ? '· confirmed ✓' : '(read to customer)'}
+                    </span>
+                    <span className="font-mono text-sm font-bold tracking-[0.3em] text-slate-800 dark:text-slate-100">{jobSession.doorstepPin}</span>
+                  </div>
+                )}
                 <div className="mt-3 flex gap-2">
                   <Button className="flex-1" icon={<PlayCircle className="h-4 w-4" />} onClick={() => startGate(job)}>
                     Start work
@@ -83,7 +93,7 @@ export function ActiveWork() {
                   <ChatButton job={job} size="md" label="Customer" />
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </section>
       )}
