@@ -20,6 +20,8 @@ import type {
   AssessmentResult,
   ChatMessage,
   IncidentCase,
+  WalletTxn,
+  CallLog,
 } from './types'
 
 export class LighthouseDB extends Dexie {
@@ -42,6 +44,8 @@ export class LighthouseDB extends Dexie {
   assessments!: Table<AssessmentResult, string>
   chat!: Table<ChatMessage, string>
   incidents!: Table<IncidentCase, string>
+  walletTxns!: Table<WalletTxn, string>
+  callLogs!: Table<CallLog, string>
 
   constructor() {
     super('lighthouse')
@@ -85,6 +89,11 @@ export class LighthouseDB extends Dexie {
     // v7 — admin broadcast announcements.
     this.version(7).stores({
       announcements: 'id, audience, createdAt',
+    })
+    // v8 — wallet ledger (payments/escrow) and voice-call history.
+    this.version(8).stores({
+      walletTxns: 'id, userId, kind, jobId, createdAt',
+      callLogs: 'id, callerId, calleeId, jobId, createdAt',
     })
   }
 }

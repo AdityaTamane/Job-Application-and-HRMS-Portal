@@ -1,4 +1,5 @@
 import { db, logAudit, notify } from './db'
+import { refundEscrow } from './payments'
 import { uid } from './utils'
 import type { Job, Student } from './types'
 
@@ -52,6 +53,8 @@ export async function createBooking(input: BookingInput): Promise<Job> {
 
 export async function cancelBooking(job: Job, byName: string) {
   await db.jobs.update(job.id, { status: 'cancelled' })
+  // Return any escrowed funds to the customer.
+  await refundEscrow(job)
   if (job.studentId) {
     const s = await db.students.get(job.studentId)
     if (s) await notify(s.userId, 'Booking cancelled', `"${job.title}" was cancelled by the customer.`, 'warning')

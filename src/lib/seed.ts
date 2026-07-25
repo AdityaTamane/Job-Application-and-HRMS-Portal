@@ -15,6 +15,7 @@ import type {
   PayrollRecord,
   DocumentRecord,
   WorkSession,
+  WalletTxn,
 } from './types'
 
 // Base city: Bengaluru. Neighbourhoods with rough coordinates.
@@ -318,6 +319,16 @@ async function runSeed(force: boolean) {
     { id: 'ann_1', title: 'Weekend demand is high 🚀', body: 'Lots of cleaning & tutoring requests expected this weekend — set yourself available to grab more jobs!', audience: 'students', sentById: 'u_admin', sentByName: 'Lighthouse Admin', recipientCount: 8, createdAt: now - day },
   ]
   await db.announcements.bulkAdd(announcements)
+
+  // --- Wallet ledger + escrow: customer paid job_1 from wallet; pro has past earnings ---
+  const walletTxns: WalletTxn[] = [
+    { id: 'wtx_1', userId: 'u_cust1', kind: 'topup', amount: 2000, note: 'Wallet top-up', createdAt: now - day * 2 },
+    { id: 'wtx_2', userId: 'u_cust1', kind: 'escrow_hold', amount: -660, note: 'Payment for "Deep clean 2BHK apartment"', jobId: 'job_1', createdAt: now - day },
+    { id: 'wtx_3', userId: 'u_stu_1', kind: 'payout', amount: 1500, note: 'Earnings from "Kitchen deep clean"', createdAt: now - day * 4 },
+    { id: 'wtx_4', userId: 'u_stu_1', kind: 'withdrawal', amount: -1000, note: 'Withdrawal to bank account', createdAt: now - day * 3 },
+  ]
+  await db.walletTxns.bulkAdd(walletTxns)
+  await db.jobs.update('job_1', { paymentStatus: 'in_escrow', escrowAmount: 660, paymentMethod: 'wallet', paidAt: now - day })
 
   // --- A couple of notifications for the demo customer ---
   await notify('u_cust1', 'Booking confirmed', 'Priya Sharma accepted your cleaning job.', 'success', '/customer/bookings')

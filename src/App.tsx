@@ -1,6 +1,8 @@
 import { lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/lib/auth'
+import { I18nProvider } from '@/lib/i18n'
+import { CallProvider } from '@/components/call/CallProvider'
 import { ToastViewport } from '@/components/ui/toast'
 import { AppShell } from '@/components/layout/AppShell'
 import { RequireAuth } from '@/components/layout/RequireAuth'
@@ -37,6 +39,7 @@ const AdminRequests = named(() => import('@/pages/admin/Requests'), 'AdminReques
 const AdminAnnouncements = named(() => import('@/pages/admin/Announcements'), 'AdminAnnouncements')
 const AdminAudit = named(() => import('@/pages/admin/Audit'), 'AdminAudit')
 const TimeOff = named(() => import('@/pages/TimeOff'), 'TimeOff')
+const WalletPage = named(() => import('@/pages/Wallet'), 'Wallet')
 const TeacherDashboard = named(() => import('@/pages/teacher/Dashboard'), 'TeacherDashboard')
 const Openings = named(() => import('@/pages/teacher/Openings'), 'Openings')
 const MyApplication = named(() => import('@/pages/teacher/MyApplication'), 'MyApplication')
@@ -51,7 +54,9 @@ const Payroll = named(() => import('@/pages/hrms/Payroll'), 'Payroll')
 export default function App() {
   return (
     <ErrorBoundary>
+      <I18nProvider>
       <AuthProvider>
+        <CallProvider>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
             {/* Public */}
@@ -64,6 +69,7 @@ export default function App() {
               <Route index element={<Explore />} />
               <Route path="bookings" element={<Bookings />} />
               <Route path="track" element={<LiveTrack />} />
+              <Route path="wallet" element={<WalletPage />} />
               <Route path="profile" element={<CustomerProfile />} />
             </Route>
 
@@ -75,6 +81,7 @@ export default function App() {
               <Route path="verification" element={<Verification />} />
               <Route path="skills" element={<Skills />} />
               <Route path="earnings" element={<Earnings />} />
+              <Route path="wallet" element={<WalletPage />} />
               <Route path="timeoff" element={<TimeOff />} />
               <Route path="profile" element={<StudentProfile />} />
             </Route>
@@ -115,7 +122,9 @@ export default function App() {
           </Routes>
           <ToastViewport />
         </BrowserRouter>
+        </CallProvider>
       </AuthProvider>
+      </I18nProvider>
     </ErrorBoundary>
   )
 }

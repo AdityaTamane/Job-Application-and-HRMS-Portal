@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Link } from 'react-router-dom'
-import { CalendarClock, MapPin, Receipt, Radar, Star, RotateCcw, XCircle, CalendarCheck, Flag } from 'lucide-react'
+import { CalendarClock, MapPin, Receipt, Radar, Star, RotateCcw, XCircle, CalendarCheck, Flag, CreditCard, ShieldCheck, CheckCircle2 } from 'lucide-react'
 import { db } from '@/lib/db'
 import { useAuth } from '@/lib/auth'
 import { cancelBooking } from '@/lib/marketplace'
-import type { Job, Student } from '@/lib/types'
+import type { Job, Student, PaymentStatus } from '@/lib/types'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs, EmptyState } from '@/components/ui/misc'
 import { Button } from '@/components/ui/Button'
@@ -15,10 +15,28 @@ import { VerifiedBadge } from '@/components/common/VerifiedBadge'
 import { Rating } from '@/components/common/Rating'
 import { BookingModal } from '@/components/marketplace/BookingModal'
 import { RateBookingModal } from '@/components/marketplace/RateBookingModal'
+import { PaymentModal } from '@/components/payments/PaymentModal'
 import { ChatButton } from '@/components/chat/ChatButton'
+import { CallButton } from '@/components/call/CallButton'
 import { ReportIssueModal } from '@/components/marketplace/ReportIssueModal'
 import { toast } from '@/components/ui/toast'
-import { formatCurrency, formatDateTime } from '@/lib/utils'
+import { cn, formatCurrency, formatDateTime } from '@/lib/utils'
+
+const PAYMENT_META: Record<PaymentStatus, { label: string; icon: typeof CreditCard; cls: string }> = {
+  unpaid: { label: 'Payment due', icon: CreditCard, cls: 'bg-beacon-50 text-beacon-700 dark:bg-beacon-400/15 dark:text-beacon-300' },
+  in_escrow: { label: 'Paid · in escrow', icon: ShieldCheck, cls: 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-200' },
+  released: { label: 'Paid', icon: CheckCircle2, cls: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' },
+  refunded: { label: 'Refunded', icon: RotateCcw, cls: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400' },
+}
+
+function PaymentPill({ status }: { status: PaymentStatus }) {
+  const m = PAYMENT_META[status]
+  return (
+    <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold', m.cls)}>
+      <m.icon className="h-3 w-3" /> {m.label}
+    </span>
+  )
+}
 
 const UPCOMING: Job['status'][] = ['requested', 'assigned', 'accepted', 'en_route', 'verifying', 'in_progress']
 const ACTIVE: Job['status'][] = ['en_route', 'verifying', 'in_progress']
@@ -37,6 +55,7 @@ export function Bookings() {
   const [rebook, setRebook] = useState<Student | null>(null)
   const [rating, setRating] = useState<Job | null>(null)
   const [reporting, setReporting] = useState<Job | null>(null)
+  const [paying, setPaying] = useState<Job | null>(null)
 
   const groups = useMemo(() => {
     const all = jobs ?? []
@@ -99,6 +118,9 @@ export function Bookings() {
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-semibold text-slate-900 dark:text-slate-100">{job.title}</h3>
                         <StatusPill status={job.status} />
+                        {job.paymentStatus && job.status !== 'cancelled' && job.status !== 'declined' && (
+                          <PaymentPill status={job.paymentStatus} />
+                        )}
                       </div>
                       {student && (
                         <p className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
@@ -118,7 +140,18 @@ export function Bookings() {
                   </div>
 
                   <div className="flex shrink-0 flex-wrap gap-2">
-                    {student && job.status !== 'cancelled' && job.status !== 'declined' && <ChatButton job={job} />}
+                    {(!job.paymentStatus || job.paymentStatus === 'unpaid') &&
+                      !['cancelled', 'declined', 'completed'].includes(job.status) && (
+                        <Button size="sm" variant="secondary" icon={<CreditCard className="h-4 w-4" />} onClick={() => setPaying(job)}>
+                          Pay now
+                        </Button>
+                      )}
+                    {student && job.status !== 'cancelled' && job.status !== 'declined' && (
+                      <>
+                        <ChatButton job={job} />
+                        <CallButton job={job} />
+                      </>
+                    )}
                     {ACTIVE.includes(job.status) && (
                       <Link to="/customer/track">
                         <Button size="sm" icon={<Radar className="h-4 w-4" />}>Track live</Button>
@@ -154,6 +187,7 @@ export function Bookings() {
 
       <BookingModal student={rebook} open={!!rebook} onClose={() => setRebook(null)} onBooked={() => setTab('upcoming')} />
       <RateBookingModal job={rating} open={!!rating} onClose={() => setRating(null)} />
+      <PaymentModal job={paying} open={!!paying} onClose={() => setPaying(null)} onPaid={() => setPaying(null)} />
       {reporting && (
         <ReportIssueModal
           job={reporting}

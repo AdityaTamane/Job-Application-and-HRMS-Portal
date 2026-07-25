@@ -11,6 +11,8 @@ import { Button } from '@/components/ui/Button'
 import { Field, Input, Textarea, Select } from '@/components/ui/form'
 import { Avatar } from '@/components/ui/Avatar'
 import { toast } from '@/components/ui/toast'
+import { PaymentModal } from '@/components/payments/PaymentModal'
+import type { Job } from '@/lib/types'
 import { cn, formatCurrency } from '@/lib/utils'
 
 export function BookingModal({
@@ -38,6 +40,8 @@ export function BookingModal({
   const [dayIdx, setDayIdx] = useState(0)
   const [duration, setDuration] = useState('2')
   const [loading, setLoading] = useState(false)
+  // After a booking is created we chain straight into payment (escrow).
+  const [payingJob, setPayingJob] = useState<Job | null>(null)
 
   const cats = useMemo(
     () => categories?.filter((c) => student?.serviceCategoryIds.includes(c.id)) ?? [],
@@ -62,7 +66,7 @@ export function BookingModal({
     }
     setLoading(true)
     try {
-      await createBooking({
+      const job = await createBooking({
         customerId: user.id,
         customerName: user.name,
         student,
@@ -75,18 +79,33 @@ export function BookingModal({
       })
       toast.success('Booking requested!', `${student.name.split(' ')[0]} will confirm shortly.`)
       onBooked()
-      onClose()
-      // reset
+      // reset the form and move to the payment step for the new job.
       setTitle('')
       setDescription('')
       setAddress('')
       setWhen(null)
       setDayIdx(0)
+      setPayingJob(job)
     } catch {
       toast.error('Could not create booking')
     } finally {
       setLoading(false)
     }
+  }
+
+  // While collecting payment, hide the booking form behind the PaymentModal.
+  if (payingJob) {
+    return (
+      <PaymentModal
+        open
+        job={payingJob}
+        onClose={() => {
+          setPayingJob(null)
+          onClose()
+        }}
+        onPaid={() => setPayingJob(null)}
+      />
+    )
   }
 
   return (

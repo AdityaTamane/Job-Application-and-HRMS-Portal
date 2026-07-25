@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Send } from 'lucide-react'
+import { Send, Phone } from 'lucide-react'
 import { db } from '@/lib/db'
 import {
   broadcast,
@@ -10,6 +10,7 @@ import {
   threadIdForJob,
   type ChatParty,
 } from '@/lib/chat'
+import { useCall } from '@/components/call/CallProvider'
 import { Modal } from '@/components/ui/Modal'
 import { Avatar } from '@/components/ui/Avatar'
 import { cn } from '@/lib/utils'
@@ -30,6 +31,7 @@ export function ChatModal({
   jobTitle?: string
 }) {
   const threadId = threadIdForJob(jobId)
+  const { startCall, inCall } = useCall()
   const messages = useLiveQuery(
     () => (open ? db.chat.where('threadId').equals(threadId).sortBy('createdAt') : []),
     [threadId, open],
@@ -88,6 +90,15 @@ export function ChatModal({
           {other.name}
           <span className="ml-1 text-xs font-normal capitalize text-slate-400 dark:text-slate-500">· {other.role}</span>
         </span>
+        <button
+          onClick={() => startCall({ id: other.id, name: other.name }, jobId)}
+          disabled={inCall}
+          className="ml-1 grid h-8 w-8 place-items-center rounded-full bg-emerald-50 text-emerald-600 transition hover:bg-emerald-100 disabled:opacity-40 dark:bg-emerald-500/15 dark:text-emerald-400"
+          aria-label={`Call ${other.name}`}
+          title={`Call ${other.name}`}
+        >
+          <Phone className="h-4 w-4" />
+        </button>
       </span>
     } size="md">
       <div className="flex h-[60vh] flex-col">

@@ -9,16 +9,30 @@ import { Logo } from '@/components/common/Logo'
 import { Avatar } from '@/components/ui/Avatar'
 import { PageLoader } from '@/components/ui/misc'
 import { NotificationBell } from './NotificationBell'
+import { NotificationsWatcher } from './NotificationsWatcher'
 import { AnnouncementBanner } from './AnnouncementBanner'
 import { ThemeToggle } from './ThemeToggle'
+import { LanguageSwitcher } from './LanguageSwitcher'
 import { MessagesButton } from '@/components/chat/MessagesButton'
 import { CommandPalette } from '@/components/command/CommandPalette'
 import { Search } from 'lucide-react'
+import { useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
+
+// Map a nav section title to its translation key.
+const NAV_TITLE_KEY: Record<string, string> = {
+  'Book a Pro': 'navTitle.customer',
+  'Student Portal': 'navTitle.student',
+  'Teacher Careers': 'navTitle.teacherCandidate',
+  'Lighthouse Faculty': 'navTitle.teacherHired',
+  'Lighthouse Admin': 'navTitle.admin',
+  'Lighthouse HRMS': 'navTitle.employee',
+}
 
 export function AppShell() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const t = useT()
   const [mobileOpen, setMobileOpen] = useState(false)
   const teacher = useTeacherStatus()
   if (!user) return null
@@ -42,8 +56,8 @@ export function AppShell() {
           <X className="h-5 w-5 text-slate-400" />
         </button>
       </div>
-      <p className="px-5 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{nav.title}</p>
-      <nav className="flex-1 space-y-1 px-3" aria-label={`${nav.title} navigation`}>
+      <p className="px-5 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">{t(NAV_TITLE_KEY[nav.title] ?? '', {}) || nav.title}</p>
+      <nav className="flex-1 space-y-1 px-3" aria-label={nav.title}>
         {nav.items.map((item) => (
           <NavLink
             key={item.to}
@@ -60,7 +74,7 @@ export function AppShell() {
             }
           >
             <Icon name={item.icon} className="h-[18px] w-[18px]" />
-            {item.label}
+            {t(`nav.${item.to}`, {}) === `nav.${item.to}` ? item.label : t(`nav.${item.to}`)}
           </NavLink>
         ))}
       </nav>
@@ -71,7 +85,7 @@ export function AppShell() {
             <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{user.name}</p>
             <p className="truncate text-xs capitalize text-slate-400 dark:text-slate-500">{user.role}</p>
           </div>
-          <button onClick={handleLogout} className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10" title="Log out" aria-label="Log out">
+          <button onClick={handleLogout} className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10" title={t('app.logout')} aria-label={t('app.logout')}>
             <LogOut className="h-4 w-4" />
           </button>
         </div>
@@ -103,10 +117,11 @@ export function AppShell() {
             aria-label="Open command palette"
           >
             <Search className="h-4 w-4" />
-            <span>Search…</span>
+            <span>{t('app.search')}</span>
             <kbd className="ml-6 rounded border border-slate-200 px-1.5 py-0.5 text-[10px] dark:border-slate-700">⌘K</kbd>
           </button>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher compact />
             <ThemeToggle />
             <MessagesButton />
             <NotificationBell />
@@ -123,6 +138,7 @@ export function AppShell() {
         </main>
       </div>
       <CommandPalette />
+      <NotificationsWatcher />
     </div>
   )
 }

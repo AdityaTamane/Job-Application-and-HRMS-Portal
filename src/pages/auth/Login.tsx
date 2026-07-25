@@ -8,6 +8,9 @@ import { Logo } from '@/components/common/Logo'
 import { Button } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/form'
 import { OtpVerify } from '@/components/work/OtpVerify'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
+import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { useT } from '@/lib/i18n'
 import { toast } from '@/components/ui/toast'
 import type { User } from '@/lib/types'
 
@@ -20,6 +23,7 @@ const DEMO = [
 export function Login() {
   const { login, verifyCredentials, loginAs } = useAuth()
   const navigate = useNavigate()
+  const t = useT()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -75,16 +79,20 @@ export function Login() {
           <Logo className="[&_span]:text-white [&_.text-beacon-600]:text-beacon-300" />
         </Link>
         <div>
-          <h2 className="text-3xl font-bold leading-tight">Work that lifts communities.</h2>
+          <h2 className="text-3xl font-bold leading-tight">{t('login.brandTitle')}</h2>
           <p className="mt-3 max-w-sm text-brand-100">
-            Sign in to book verified pros, find local work, or manage the academy.
+            {t('login.brandSubtitle')}
           </p>
         </div>
         <p className="text-xs text-brand-200">© 2026 Lighthouse Academy Works</p>
       </div>
 
       {/* Form panel */}
-      <div className="flex items-center justify-center p-6">
+      <div className="relative flex items-center justify-center p-6">
+        <div className="absolute right-4 top-4 flex items-center gap-1">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-sm">
           <div className="mb-6 lg:hidden">
             <Link to="/"><Logo /></Link>
@@ -105,26 +113,26 @@ export function Login() {
             </div>
           ) : (
           <>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Log in</h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Welcome back to Lighthouse.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('login.title')}</h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('login.subtitle')}</p>
 
           <form onSubmit={submit} className="mt-6 space-y-4">
-            <Field label="Email" required>
+            <Field label={t('login.email')} required>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
             </Field>
-            <Field label="Password" required>
+            <Field label={t('login.password')} required>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
             </Field>
-            <Button type="submit" className="w-full" loading={loading}>Log in</Button>
+            <Button type="submit" className="w-full" loading={loading}>{t('login.submit')}</Button>
           </form>
 
           <p className="mt-4 text-center text-sm text-slate-500 dark:text-slate-400">
-            New here?{' '}
-            <Link to="/register" className="font-semibold text-brand-600 hover:underline">Create an account</Link>
+            {t('login.newHere')}{' '}
+            <Link to="/register" className="font-semibold text-brand-600 hover:underline">{t('login.createAccount')}</Link>
           </p>
 
           <div className="my-6 flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" /> QUICK DEMO LOGIN <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" /> {t('login.quickDemo')} <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
           </div>
           <div className="grid grid-cols-3 gap-2">
             {DEMO.map((d) => (
@@ -141,10 +149,10 @@ export function Login() {
           </div>
           <div className="mt-3 flex items-center justify-center gap-4 text-xs text-slate-400 dark:text-slate-500">
             <Link to="/register?role=teacher" className="inline-flex items-center gap-1 hover:text-brand-600">
-              <Users className="h-3.5 w-3.5" /> Apply to teach
+              <Users className="h-3.5 w-3.5" /> {t('login.applyTeach')}
             </Link>
             <button onClick={resetDemo} disabled={resetting} className="inline-flex items-center gap-1 hover:text-brand-600 disabled:opacity-50">
-              <RotateCcw className="h-3.5 w-3.5" /> {resetting ? 'Resetting…' : 'Reset demo data'}
+              <RotateCcw className="h-3.5 w-3.5" /> {resetting ? t('login.resetting') : t('login.reset')}
             </button>
           </div>
           </>

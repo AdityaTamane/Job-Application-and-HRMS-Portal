@@ -17,42 +17,29 @@ import {
 import { Logo } from '@/components/common/Logo'
 import { Button } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/layout/ThemeToggle'
+import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
+import { useT } from '@/lib/i18n'
 
 const MODULES = [
-  {
-    to: '/login',
-    icon: Compass,
-    title: 'Hire a Pro',
-    desc: 'Book verified academy graduates for cleaning, repairs, tutoring & more near you.',
-    cta: 'Book a service',
-    accent: 'bg-brand-gradient',
-  },
-  {
-    to: '/register?role=student',
-    icon: GraduationCap,
-    title: 'Join as a Graduate',
-    desc: 'Lighthouse Academy graduate? Register, get verified, and find work in your neighbourhood.',
-    cta: 'Register now',
-    accent: 'bg-beacon-gradient',
-  },
+  { to: '/login', icon: Compass, key: 'hire', accent: 'bg-brand-gradient' },
+  { to: '/register?role=student', icon: GraduationCap, key: 'student', accent: 'bg-beacon-gradient' },
   {
     to: '/register?role=teacher',
     icon: Users,
-    title: 'Teach with us',
-    desc: 'Apply to train the next batch of students. Full hiring process, transparent stages.',
-    cta: 'Apply to teach',
+    key: 'teacher',
     accent: 'bg-gradient-to-br from-emerald-500 to-emerald-600',
   },
 ]
 
 const TRUST = [
-  { icon: Camera, label: 'AI liveness', desc: 'On-device face check before every job' },
-  { icon: Mic, label: 'Mic consent', desc: 'Audio safety on active work' },
-  { icon: KeyRound, label: 'OTP verified', desc: 'Customer confirms with a code' },
-  { icon: MapPin, label: 'Live location', desc: 'Geofenced start & live tracking' },
+  { icon: Camera, key: 'liveness' },
+  { icon: Mic, key: 'mic' },
+  { icon: KeyRound, key: 'otp' },
+  { icon: MapPin, key: 'location' },
 ]
 
 export function Landing() {
+  const t = useT()
   return (
     <div className="min-h-full">
       {/* Nav */}
@@ -60,12 +47,13 @@ export function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
           <Logo />
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             <Link to="/login">
-              <Button variant="ghost" size="sm">Log in</Button>
+              <Button variant="ghost" size="sm">{t('landing.login')}</Button>
             </Link>
             <Link to="/register">
-              <Button size="sm">Get started</Button>
+              <Button size="sm">{t('landing.getStarted')}</Button>
             </Link>
           </div>
         </div>
@@ -78,33 +66,32 @@ export function Landing() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
           <div className="max-w-2xl animate-fade-in">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-beacon-200 backdrop-blur">
-              <ShieldCheck className="h-3.5 w-3.5" /> An NGO initiative · Verified local talent
+              <ShieldCheck className="h-3.5 w-3.5" /> {t('landing.hero.badge')}
             </span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight lg:text-6xl">
-              Trusted help from your{' '}
+              {t('landing.hero.title')}{' '}
               <span className="bg-gradient-to-r from-beacon-300 to-beacon-500 bg-clip-text text-transparent">
-                neighbourhood.
+                {t('landing.hero.titleHighlight')}
               </span>
             </h1>
             <p className="mt-5 text-lg text-brand-100">
-              Lighthouse trains people from underserved communities and connects them to local work —
-              every graduate background-verified, every job safety-tracked.
+              {t('landing.hero.subtitle')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/login">
                 <Button size="lg" variant="secondary" icon={<Compass className="h-5 w-5" />}>
-                  Hire a Pro
+                  {t('landing.hero.hire')}
                 </Button>
               </Link>
               <Link to="/register?role=student">
                 <Button size="lg" variant="outline" className="border-white/30 bg-white/10 text-white backdrop-blur hover:bg-white/20 dark:border-white/30 dark:bg-white/10 dark:text-white">
-                  I'm a graduate
+                  {t('landing.hero.graduate')}
                 </Button>
               </Link>
             </div>
             <div className="mt-8 flex items-center gap-6 text-sm text-brand-100">
-              <span className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-beacon-400 text-beacon-400" /> 4.8 avg rating</span>
-              <span className="flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-beacon-300" /> 500+ verified pros</span>
+              <span className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-beacon-400 text-beacon-400" /> {t('landing.hero.rating')}</span>
+              <span className="flex items-center gap-1.5"><BadgeCheck className="h-4 w-4 text-beacon-300" /> {t('landing.hero.pros')}</span>
             </div>
           </div>
 
@@ -136,24 +123,24 @@ export function Landing() {
 
       {/* Modules */}
       <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="text-center text-3xl font-bold text-slate-900 dark:text-slate-100">One platform, four journeys</h2>
+        <h2 className="text-center text-3xl font-bold text-slate-900 dark:text-slate-100">{t('landing.modules.title')}</h2>
         <p className="mx-auto mt-2 max-w-xl text-center text-slate-500 dark:text-slate-400">
-          Whether you need help, want work, or want to teach — start here.
+          {t('landing.modules.subtitle')}
         </p>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {MODULES.map((m) => (
             <Link
-              key={m.title}
+              key={m.key}
               to={m.to}
               className="group card p-6 transition-all duration-200 hover:-translate-y-1.5 hover:shadow-lift"
             >
               <div className={`inline-flex rounded-2xl ${m.accent} p-3 text-white shadow-glow`}>
                 <m.icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 text-lg font-bold text-slate-900 dark:text-slate-100">{m.title}</h3>
-              <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">{m.desc}</p>
+              <h3 className="mt-4 text-lg font-bold text-slate-900 dark:text-slate-100">{t(`landing.module.${m.key}.title`)}</h3>
+              <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">{t(`landing.module.${m.key}.desc`)}</p>
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 transition-all group-hover:gap-2 dark:text-brand-300">
-                {m.cta} <ArrowRight className="h-4 w-4" />
+                {t(`landing.module.${m.key}.cta`)} <ArrowRight className="h-4 w-4" />
               </span>
             </Link>
           ))}
@@ -164,20 +151,20 @@ export function Landing() {
       <section className="py-16">
         <div className="mx-auto max-w-6xl px-5">
           <div className="text-center">
-            <span className="text-sm font-semibold uppercase tracking-wider text-beacon-600 dark:text-beacon-400">Safety first</span>
-            <h2 className="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-100">Verification at every step</h2>
+            <span className="text-sm font-semibold uppercase tracking-wider text-beacon-600 dark:text-beacon-400">{t('landing.trust.eyebrow')}</span>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900 dark:text-slate-100">{t('landing.trust.title')}</h2>
             <p className="mx-auto mt-2 max-w-xl text-slate-500 dark:text-slate-400">
-              Documents checked by our admin team, and an AI safety gate before any pro begins work.
+              {t('landing.trust.subtitle')}
             </p>
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {TRUST.map((t) => (
-              <div key={t.label} className="card p-5 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
+            {TRUST.map((item) => (
+              <div key={item.key} className="card p-5 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-lift">
                 <div className="mx-auto inline-flex rounded-2xl bg-brand-50 p-3 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
-                  <t.icon className="h-6 w-6" />
+                  <item.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mt-3 font-semibold text-slate-800 dark:text-slate-100">{t.label}</h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t.desc}</p>
+                <h3 className="mt-3 font-semibold text-slate-800 dark:text-slate-100">{t(`landing.trust.${item.key}.label`)}</h3>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t(`landing.trust.${item.key}.desc`)}</p>
               </div>
             ))}
           </div>
@@ -187,9 +174,9 @@ export function Landing() {
       <footer className="border-t border-slate-200/70 py-8 dark:border-slate-800">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 sm:flex-row">
           <Logo />
-          <p className="text-sm text-slate-400 dark:text-slate-500">© 2026 Lighthouse Academy Works · A not-for-profit initiative</p>
+          <p className="text-sm text-slate-400 dark:text-slate-500">{t('landing.footer.copyright')}</p>
           <Link to="/login" className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-300">
-            Admin / Staff login
+            {t('landing.footer.adminLogin')}
           </Link>
         </div>
       </footer>

@@ -1,5 +1,6 @@
 import { db, logAudit, notify } from './db'
 import { createIncident } from './incidents'
+import { releaseEscrow } from './payments'
 import { uid, generateOtp, distanceMeters } from './utils'
 import type { GeoPoint, Job, Student, WorkSession } from './types'
 
@@ -123,6 +124,9 @@ export async function endWork(session: WorkSession, job: Job) {
     await db.students.update(student.id, { jobsCompleted: student.jobsCompleted + 1 })
     await logAudit(student.userId, student.name, 'end_work', job.id)
   }
+  // Release any escrowed payment to the pro's wallet now that work is done.
+  const freshJob = await db.jobs.get(job.id)
+  if (freshJob) await releaseEscrow(freshJob)
   await notify(job.customerId, 'Job completed', `"${job.title}" has been marked complete. Please rate your experience.`, 'success', '/customer/bookings')
 }
 

@@ -120,6 +120,9 @@ export type JobStatus =
   | 'completed'
   | 'cancelled'
 
+export type PaymentStatus = 'unpaid' | 'in_escrow' | 'released' | 'refunded'
+export type PaymentMethod = 'card' | 'wallet' | 'upi'
+
 export interface Job {
   id: string
   customerId: string
@@ -141,6 +144,11 @@ export interface Job {
   customerReview?: string
   studentRating?: number
   studentReview?: string
+  // Payments & escrow (simulated gateway — funds held until job completion)
+  paymentStatus?: PaymentStatus
+  escrowAmount?: number
+  paymentMethod?: PaymentMethod
+  paidAt?: number
   createdAt: number
 }
 
@@ -396,6 +404,46 @@ export interface IncidentCase {
   resolutionNote?: string
   createdAt: number
   updatedAt: number
+}
+
+// ---------------------------------------------------------------------------
+// Wallet & payments (simulated gateway + escrow)
+// ---------------------------------------------------------------------------
+
+export type WalletTxnKind =
+  | 'topup' // customer/user adds money
+  | 'escrow_hold' // wallet-funded booking payment moved into escrow
+  | 'payout' // escrow released to a pro on job completion
+  | 'refund' // escrow returned to the customer
+  | 'withdrawal' // pro withdraws earnings out
+
+/** A single movement in a user's wallet ledger. Balance = sum of `amount`. */
+export interface WalletTxn {
+  id: string
+  userId: string
+  kind: WalletTxnKind
+  amount: number // signed: credit (+) / debit (−), in INR
+  note: string
+  jobId?: string
+  createdAt: number
+}
+
+// ---------------------------------------------------------------------------
+// Voice calls (in-app calling service — signalling over BroadcastChannel)
+// ---------------------------------------------------------------------------
+
+export type CallOutcome = 'completed' | 'missed' | 'declined' | 'cancelled' | 'unavailable'
+
+export interface CallLog {
+  id: string
+  jobId?: string
+  callerId: string
+  callerName: string
+  calleeId: string
+  calleeName: string
+  outcome: CallOutcome
+  durationSeconds: number
+  createdAt: number
 }
 
 // ---------------------------------------------------------------------------
